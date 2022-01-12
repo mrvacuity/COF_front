@@ -1,5 +1,5 @@
 import axios from "axios";
-const BaseUrl = "https://fffd-183-89-109-83.ngrok.io/api";
+const BaseUrl = "https://api-cof.wishesexistence.co/api";
 // const BaseUrl = "http://localhost:5000/api";
 
 async function apiservice({ url, method, path, body, token }) {
