@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,30 +16,78 @@ import {
   Entypo,
   FontAwesome,
 } from "@expo/vector-icons";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import { apiservice } from "../../service/api";
+import { authActionScore } from "../../action/authAction";
 const { width, height } = Dimensions.get("screen");
-export default function Pretest({ navigation }) {
+export default function Pretest({ navigation, route }) {
   const [choiceIndex, setChoiceIndex] = useState(-1);
   const [data, setData] = useState("");
+  const [token, setToken] = useRecoilState(tokenState);
+  const [quiz, setQuiz] = useState([]);
+  const [check, setCheck] = useState();
+  const [ans, setAns] = useState([]);
+  const [state, setstate] = useState({
+    lesson_id: route.params.id,
+    score: "",
+  });
+  console.log(state);
+  useEffect(() => {
+    conditions(token);
+  }, []);
+  async function send() {
+    setstate({
+      ...state,
+      score: (
+        (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
+        100
+      ).toFixed(),
+    });
+    if (state.score != "") {
+      const send = await authActionScore({
+        state,
+        token: token.accessToken,
+      });
+      if (send) {
+        console.log("OK");
+        navigation.navigate("Lesson", route.params);
+      }
+    }
+  }
+  const getPreTest = async () => {
+    const res = await apiservice({
+      path: "/lesson/gettest/" + route.params.id,
+      method: "get",
+    });
 
-  const DATA = [
-    {
-      Q: "When we should to stopped if we want the light color?",
-      A: ["15 min", "End of first crack"],
-    },
-    {
-      Q: "If you want light roasted coffee beans, what temperature should you use?",
-      A: ["200 °F", "356 °F"],
-    },
-    {
-      Q: "If you want light roasted coffee beans, what temperature should you use?",
-      A: ["200 °F", "356 °F"],
-    },
-  ];
+    if (res.status == 200) {
+      setQuiz(res.data.data);
+    } else {
+    }
+  };
+  const conditions = async () => {
+    const res = await apiservice({
+      path: "/lesson/checkcondition/" + route.params.id,
+      method: "get",
+      token: token.accessToken,
+    });
+
+    if (res.status == 200) {
+      if (res.data == false) {
+        getPreTest();
+      } else {
+        navigation.navigate("Lesson", route.params);
+      }
+    } else {
+    }
+  };
   const choiceChangeHandler = (index, data) => {
     // console.log("index \t", index);
     setChoiceIndex((preIndex) => index);
     setData(data);
   };
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -64,22 +112,37 @@ export default function Pretest({ navigation }) {
           <FlatList
             numColumns={1}
             style={{}}
-            data={DATA}
+            data={quiz}
             renderItem={({ item, index }) => {
               return (
                 <View style={{ borderBottomWidth: 0.5, paddingVertical: 17 }}>
                   <Text style={[styles.textLight, { marginBottom: 11 }]}>
-                    {item.Q}
+                    {item.title}
                   </Text>
-                  {item.A.map((data, index) => (
+                  {item.choice.map((data, indexs) => (
                     <TouchableOpacity
                       key={data}
                       style={styles.buttonSelect}
-                      onPress={choiceChangeHandler.bind(this, index, data)}
+                      onPress={() => {
+                        setAns((val) => {
+                          return val.filter((e) => e.number != index);
+                        });
+                        setAns((val) =>
+                          val.concat({
+                            number: index,
+                            myAns: data,
+                            Answer: item.answer,
+                          })
+                        );
+                      }}
                     >
                       <FontAwesome
                         name={
-                          index === choiceIndex ? "dot-circle-o" : "circle-thin"
+                          ans.filter(
+                            (e) => e.myAns == data && e.number == index
+                          ).length > 0
+                            ? "dot-circle-o"
+                            : "circle-thin"
                         }
                         size={14}
                         color="#484848"
@@ -101,12 +164,7 @@ export default function Pretest({ navigation }) {
           />
         </View>
         <View style={{ height: height * 0.06 }}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("Lesson");
-            }}
-            style={styles.buttonDone}
-          >
+          <TouchableOpacity onPress={send} style={styles.buttonDone}>
             <Text
               style={{ fontSize: 18, fontFamily: "Roboto", color: "#484848" }}
             >

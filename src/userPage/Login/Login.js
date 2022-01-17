@@ -28,7 +28,7 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 import { apiservice } from "../../service/api";
-import { tokenState } from "../../recoil/recoil";
+import { Authen, tokenState } from "../../recoil/recoil";
 import { useRecoilState } from "recoil";
 
 function Input({
@@ -38,6 +38,8 @@ function Input({
   defaultValue,
   onChangeText,
   secureTextEntry,
+  borderColor,
+  borderWidth,
 }) {
   return (
     <View style={{ justifyContent: "center", marginTop: 24 }}>
@@ -74,6 +76,8 @@ function Input({
           fontSize: 13,
           fontFamily: "Roboto",
           color: "#484848",
+          borderColor: borderColor,
+          borderWidth: borderWidth,
         }}
       />
     </View>
@@ -88,33 +92,26 @@ export default function Login({ navigation }) {
   const [openCalenda, setstate] = useState(false);
   const [selectDate, setSlectDate] = useState("dd/mm/year");
   const [image, setImage] = useState(null);
+  const [auth, setAuth] = useState(useRecoilState(Authen));
   const [modalVisible, setModalVisible] = useState(false);
-
-  const week = [
-    "อาทิตย์",
-    "จันทร์",
-    "อังคาร",
-    "พุธ",
-    "พฤหัสบดี",
-    "ศุกร์",
-    "เสาร์",
-  ];
+  const [warningLogin, setWarningLogin] = useState(false);
+  const week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const months = [
-    "ม.ค.",
-    "ก.พ.",
-    "ม.ค.",
-    "เม.ย.",
-    "พ.ค.",
-    "มิ.ย.",
-    "ก.ค.",
-    "ส.ค.",
-    "ก.ย.",
-    "ต.ค.",
-    "พ.ย",
-    "ธ.ค.",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
-  const [day, setday] = useState(moment().add(543, "year").format("LLLL"));
+  const [day, setday] = useState(moment().format("LLLL"));
   const [showDate, setShowDate] = useState("");
   const [regisBody, setRegisBody] = useState({
     username: "",
@@ -126,6 +123,7 @@ export default function Login({ navigation }) {
     birth_date: "",
   });
   const [token, setState] = useRecoilState(tokenState);
+  console.log(token);
   const [loginBody, setLoginBody] = useState({
     username: "",
     password: "",
@@ -133,85 +131,85 @@ export default function Login({ navigation }) {
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+
+      quality: 0.4,
+      base64: true,
     });
 
-    console.log(result);
-
-    if (!result.cancelled) {
+    const res = await apiservice({
+      path: "/image/create",
+      method: "post",
+      body: {
+        name: result.uri.split("/").reverse()[0],
+        base64: "data:image/png;base64," + result.base64,
+      },
+    });
+    console.log(res.data);
+    if (res.status == 200) {
       setImage(result.uri);
+      setRegisBody({
+        ...regisBody,
+        image_profile: res.data.imageRefId.replace(".png", ""),
+      });
+    } else {
     }
   };
   const login = async () => {
-    const res = await apiservice({
-      path: "/authen/login",
-      method: "post",
-      body: loginBody,
-    });
-    if (res.status == 200) {
-      setState(res.data);
-      navigation.navigate("MyTabs");
+    if (loginBody.username.length > 0 && loginBody.password.length > 0) {
+      const res = await apiservice({
+        path: "/authen/login",
+        method: "post",
+        body: loginBody,
+      });
+      if (res.status == 200) {
+        setState(res.data);
+        setAuth({
+          auth: true,
+        });
+        setTimeout(() => {
+          navigation.navigate("MyTabs");
+        }, 300);
+      } else {
+        setWarningLogin(true);
+      }
     } else {
-      Alert.alert(res.data.message);
+      setWarningLogin(true);
     }
   };
-
-  async function register() {
-    const res = await apiservice({
-      path: "/authen/register",
-      method: "post",
-      body: regisBody,
-    });
-
-    if (res.status == 200) {
-      Alert.alert("Register success!");
-      setPage(1);
-    } else {
-      Alert.alert(res.data.message);
-    }
-  }
-
-  async function register() {
-    const res = await apiservice({
-      path: "/authen/register",
-      method: "post",
-      body: regisBody,
-    });
-
-    if (res.status == 200) {
-      Alert.alert("Register success!");
-      setPage(1);
-    } else {
-      Alert.alert(res.data.message);
+  const emailValid =
+    /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+  function errors({ value, type }) {
+    if (type == "email") {
+      return emailValid.test(value);
     }
   }
+  async function register() {
+    if (
+      regisBody.birth_date != "" &&
+      regisBody.email != "" &&
+      regisBody.first_name != "" &&
+      regisBody.image_profile != "" &&
+      regisBody.last_name != "" &&
+      regisBody.password != "" &&
+      regisBody.username != ""
+    ) {
+      const res = await apiservice({
+        path: "/authen/register",
+        method: "post",
+        body: regisBody,
+      });
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === "ios");
-    setDate(currentDate);
-    setSlectDate(currentDate);
-    setRegisBody((val) => ({ ...val, birth_date: currentDate }));
-  };
-
-  const showMode = (currentMode) => {
-    setShow((val) => !val);
-    setMode(currentMode);
-  };
-
-  const showDatepicker = () => {
-    showMode("date");
-  };
-
-  const placeholder = {
-    label: "dd",
-    value: null,
-    color: "#CCCCCC",
-  };
-
+      if (res.status == 200) {
+        Alert.alert("Register success!");
+        setPage(1);
+      } else {
+        Alert.alert(res.data.message);
+      }
+    } else {
+      Alert.alert("Please fill out the information correctly and completely.");
+    }
+  }
   function LoginSocial() {
     return (
       <View style={{ flexDirection: "row" }}>
@@ -321,8 +319,13 @@ export default function Login({ navigation }) {
               <View style={{ alignItems: "center" }}>
                 <Text style={styles.textTitle}>SIGN IN</Text>
                 <Input
+                  borderWidth={warningLogin ? 1 : 0}
+                  borderColor={warningLogin && "#F57676"}
                   defaultValue={loginBody.username}
                   onChangeText={(text) => {
+                    if (loginBody.username != "") {
+                      setWarningLogin(false);
+                    }
                     setLoginBody((val) => ({ ...val, username: text }));
                   }}
                   feather={"user"}
@@ -330,14 +333,24 @@ export default function Login({ navigation }) {
                 />
                 <View>
                   <Input
+                    borderWidth={warningLogin ? 1 : 0}
+                    borderColor={warningLogin && "#F57676"}
                     secureTextEntry={true}
                     defaultValue={loginBody.password}
                     onChangeText={(text) => {
+                      if (loginBody.password != "") {
+                        setWarningLogin(false);
+                      }
                       setLoginBody((val) => ({ ...val, password: text }));
                     }}
                     feather={"lock"}
                     placeholder={"Password"}
                   />
+                  {warningLogin && (
+                    <Text style={styles.warningLogin}>
+                      Wrong Username / Password
+                    </Text>
+                  )}
                   <TouchableOpacity
                     onPress={() => {
                       setPage(3);
@@ -388,7 +401,24 @@ export default function Login({ navigation }) {
                     marginTop: 33,
                   }}
                 >
-                  <Feather name="user-plus" size={30} color="#484848" />
+                  {image != null ? (
+                    <Image
+                      style={{
+                        width: 90,
+                        height: 90,
+                        borderRadius: 100,
+                        alignSelf: "center",
+                        backgroundColor: "#CCCCCC",
+                      }}
+                      source={{
+                        uri:
+                          // "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                          image,
+                      }}
+                    />
+                  ) : (
+                    <Feather name="user-plus" size={30} color="#484848" />
+                  )}
                 </TouchableOpacity>
                 <View
                   style={{
@@ -491,6 +521,12 @@ export default function Login({ navigation }) {
                   email
                   placeholder={"Email"}
                 />
+                {regisBody.email.length > 0 &&
+                  !errors({ value: regisBody.email, type: "email" }) && (
+                    <Text style={styles.warningLogin}>
+                      invalid email format.
+                    </Text>
+                  )}
                 <Input
                   secureTextEntry={true}
                   defaultValue={regisBody.password}
@@ -615,7 +651,7 @@ export default function Login({ navigation }) {
               initialDate={day}
               nextTitle={<AntDesign name="right" size={24} />}
               previousTitle={<AntDesign name="left" size={24} />}
-              maxDate={moment(new Date()).add(543, "year").format("LLLL")}
+              maxDate={moment(new Date()).format("LLLL")}
               selectedDayColor="#F8831C"
               selectedDayTextColor="#FFFFFF"
               onDateChange={(day) => {
@@ -747,5 +783,11 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: width * 0.05,
     paddingVertical: 50,
+  },
+  warningLogin: {
+    fontSize: 10,
+    fontFamily: "Roboto",
+    color: "#F57676",
+    marginTop: 4,
   },
 });

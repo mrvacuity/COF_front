@@ -18,200 +18,98 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("screen");
-export default function Lesson({ navigation }) {
+export default function Lesson({ navigation, route }) {
   const [page, setPage] = useState(1);
   const [testLight, setTestLight] = useState(false);
   const [testMedium, setTestMedium] = useState(false);
   const [testDark, setTestDark] = useState(false);
+  const data = route.params.lesson;
   return (
     <View style={styles.container}>
       <SafeAreaView />
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
-      <View style={[styles.viewDetail]}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingLeft: 29,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack("");
-            }}
-            style={{ width: "10%" }}
-          >
-            <Entypo name="chevron-thin-left" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.textTitle}>Roasting</Text>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("TestHistory");
+      <ScrollView style={{ height: "100%", backgroundColor: "#f0e9e4" }}>
+        <View style={[styles.viewDetail]}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingLeft: 29,
             }}
           >
-            <MaterialCommunityIcons
-              name="clock-time-four-outline"
-              size={26}
-              color="#484848"
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={{ flexDirection: "row", marginTop: 10 }}>
-          <TouchableOpacity
-            onPress={() => {
-              setPage(1);
-              setTestLight(false);
-              setTestDark(false);
-              setTestMedium(false);
-            }}
-            style={[
-              styles.selextPage1,
-              {
-                backgroundColor: page == 1 ? "#FFFFFF" : "#E6E6E6",
-              },
-            ]}
-          >
-            <Text style={styles.textLight}>Light</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setPage(2);
-              setTestLight(false);
-              setTestDark(false);
-              setTestMedium(false);
-            }}
-            style={[
-              styles.selectPage2,
-              {
-                backgroundColor: page == 2 ? "#FFFFFF" : "#E6E6E6",
-              },
-            ]}
-          >
-            <Text style={[styles.textLight]}>Medium</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setPage(3);
-              setTestLight(false);
-              setTestDark(false);
-              setTestMedium(false);
-            }}
-            style={[
-              styles.selectPage2,
-              {
-                backgroundColor: page == 3 ? "#FFFFFF" : "#DCDCDC",
-                zIndex: 3,
-              },
-            ]}
-          >
-            <Text style={[styles.textLight]}>Dark</Text>
-          </TouchableOpacity>
-        </View>
-        {page == 1 ? (
-          <View style={styles.viewPage}>
-            <View
-              style={{
-                flexDirection: "row",
-                width: "120%",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
-                Light Roast
-              </Text>
-              {testLight ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("Test");
-                  }}
-                  style={[styles.buttonTest, { width: 105 }]}
-                >
-                  <Text style={styles.textLight}>{"Test >>>"}</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => {
-                    setTestLight((val) => !val);
-                  }}
-                  style={styles.buttonTest}
-                >
-                  <Text style={styles.textLight}>{"<<<"}</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <View style={styles.viewImgCoffee}>
-              <Text style={styles.text15}>Coffee Picture</Text>
-            </View>
-            <Text style={styles.textLight}>
-              It is a roasting process where the coffee beans are not exposed to
-              much heat. The resulting coffee beans are light in color. The
-              coffee beans will not come out as much oil. The coffee taste is
-              sour from the fruit acids. And a little sweet on the tip of the
-              tongue, which is the identity of light roast coffee. The resulting
-              aroma will come out in the direction of fruits, flowers, and
-              berries. Gives a light, refreshing taste, not bitter when eating,
-              light roast coffee is popularly used to make hot coffee. It can be
-              a drip, siphon, or various slobars.
-            </Text>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("Video");
+                navigation.navigate("MyTabs");
               }}
-              style={styles.buttonVideo}
+              style={{ width: "10%" }}
             >
-              <Text style={styles.textLight}>Video</Text>
+              <Entypo name="chevron-thin-left" size={24} color="black" />
             </TouchableOpacity>
-          </View>
-        ) : page == 2 ? (
-          <View style={styles.viewPage}>
-            <View
-              style={{
-                flexDirection: "row",
-                width: "120%",
-                justifyContent: "space-between",
+            <Text style={styles.textTitle}>Roasting</Text>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("TestHistory");
               }}
             >
-              <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
-                Medium Roast
-              </Text>
-              {testMedium ? (
-                <TouchableOpacity
-                  onPress={() => {}}
-                  style={[styles.buttonTest, { width: 105 }]}
-                >
-                  <Text style={styles.textLight}>{"Test >>>"}</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => {
-                    setTestMedium((val) => !val);
-                  }}
-                  style={styles.buttonTest}
-                >
-                  <Text style={styles.textLight}>{"<<<"}</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <View style={styles.viewImgCoffee}>
-              <Text style={styles.text15}>Coffee Picture</Text>
-            </View>
-            <Text style={styles.textLight}>
-              It is a roasting process where the coffee beans are not exposed to
-              much heat. The resulting coffee beans are light in color. The
-              coffee beans will not come out as much oil. The coffee taste is
-              sour from the fruit acids. And a little sweet on the tip of the
-              tongue, which is the identity of light roast coffee. The resulting
-              aroma will come out in the direction of fruits, flowers, and
-              berries. Gives a light, refreshing taste, not bitter when eating,
-              light roast coffee is popularly used to make hot coffee. It can be
-              a drip, siphon, or various slobars.
-            </Text>
-            <TouchableOpacity style={styles.buttonVideo}>
-              <Text style={styles.textLight}>Video</Text>
+              <MaterialCommunityIcons
+                name="clock-time-four-outline"
+                size={26}
+                color="#484848"
+              />
             </TouchableOpacity>
           </View>
-        ) : (
-          page == 3 && (
+          <View style={{ flexDirection: "row", marginTop: 10 }}>
+            <TouchableOpacity
+              onPress={() => {
+                setPage(1);
+                setTestLight(false);
+                setTestDark(false);
+                setTestMedium(false);
+              }}
+              style={[
+                styles.selextPage1,
+                {
+                  backgroundColor: page == 1 ? "#FFFFFF" : "#E6E6E6",
+                },
+              ]}
+            >
+              <Text style={styles.textLight}>Light</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setPage(2);
+                setTestLight(false);
+                setTestDark(false);
+                setTestMedium(false);
+              }}
+              style={[
+                styles.selectPage2,
+                {
+                  backgroundColor: page == 2 ? "#FFFFFF" : "#E6E6E6",
+                },
+              ]}
+            >
+              <Text style={[styles.textLight]}>Medium</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setPage(3);
+                setTestLight(false);
+                setTestDark(false);
+                setTestMedium(false);
+              }}
+              style={[
+                styles.selectPage2,
+                {
+                  backgroundColor: page == 3 ? "#FFFFFF" : "#DCDCDC",
+                  zIndex: 3,
+                },
+              ]}
+            >
+              <Text style={[styles.textLight]}>Dark</Text>
+            </TouchableOpacity>
+          </View>
+          {page == 1 ? (
             <View style={styles.viewPage}>
               <View
                 style={{
@@ -221,9 +119,56 @@ export default function Lesson({ navigation }) {
                 }}
               >
                 <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
-                  Dark Roast
+                  {data[0].title}
                 </Text>
-                {testDark ? (
+                {testLight ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("Test");
+                    }}
+                    style={[styles.buttonTest, { width: 105 }]}
+                  >
+                    <Text style={styles.textLight}>{"Test >>>"}</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setTestLight((val) => !val);
+                    }}
+                    style={styles.buttonTest}
+                  >
+                    <Text style={styles.textLight}>{"<<<"}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <Image
+                style={styles.viewImgCoffee}
+                source={{ uri: data[0].image_url }}
+              />
+
+              <Text style={styles.textLight}>{data[0].description}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Video", route.params.lesson[0]);
+                }}
+                style={styles.buttonVideo}
+              >
+                <Text style={styles.textLight}>Video</Text>
+              </TouchableOpacity>
+            </View>
+          ) : page == 2 ? (
+            <View style={styles.viewPage}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  width: "120%",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
+                  {data[1].title}
+                </Text>
+                {testMedium ? (
                   <TouchableOpacity
                     onPress={() => {}}
                     style={[styles.buttonTest, { width: 105 }]}
@@ -233,7 +178,7 @@ export default function Lesson({ navigation }) {
                 ) : (
                   <TouchableOpacity
                     onPress={() => {
-                      setTestDark((val) => !val);
+                      setTestMedium((val) => !val);
                     }}
                     style={styles.buttonTest}
                   >
@@ -241,27 +186,69 @@ export default function Lesson({ navigation }) {
                   </TouchableOpacity>
                 )}
               </View>
-              <View style={styles.viewImgCoffee}>
-                <Text style={styles.text15}>Coffee Picture</Text>
-              </View>
-              <Text style={styles.textLight}>
-                It is a roasting process where the coffee beans are not exposed
-                to much heat. The resulting coffee beans are light in color. The
-                coffee beans will not come out as much oil. The coffee taste is
-                sour from the fruit acids. And a little sweet on the tip of the
-                tongue, which is the identity of light roast coffee. The
-                resulting aroma will come out in the direction of fruits,
-                flowers, and berries. Gives a light, refreshing taste, not
-                bitter when eating, light roast coffee is popularly used to make
-                hot coffee. It can be a drip, siphon, or various slobars.
-              </Text>
-              <TouchableOpacity style={styles.buttonVideo}>
+              <Image
+                style={styles.viewImgCoffee}
+                source={{ uri: data[1].image_url }}
+              />
+              <Text style={styles.textLight}>{data[1].description}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Video", route.params.lesson[1]);
+                }}
+                style={styles.buttonVideo}
+              >
                 <Text style={styles.textLight}>Video</Text>
               </TouchableOpacity>
             </View>
-          )
-        )}
-      </View>
+          ) : (
+            page == 3 && (
+              <View style={styles.viewPage}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    width: "120%",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
+                    {data[2].title}
+                  </Text>
+                  {testDark ? (
+                    <TouchableOpacity
+                      onPress={() => {}}
+                      style={[styles.buttonTest, { width: 105 }]}
+                    >
+                      <Text style={styles.textLight}>{"Test >>>"}</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setTestDark((val) => !val);
+                      }}
+                      style={styles.buttonTest}
+                    >
+                      <Text style={styles.textLight}>{"<<<"}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <Image
+                  style={styles.viewImgCoffee}
+                  source={{ uri: data[2].image_url }}
+                />
+                <Text style={styles.textLight}>{data[2].description}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Video", route.params.lesson[2]);
+                  }}
+                  style={styles.buttonVideo}
+                >
+                  <Text style={styles.textLight}>Video</Text>
+                </TouchableOpacity>
+              </View>
+            )
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 }

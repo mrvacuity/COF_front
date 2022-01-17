@@ -17,11 +17,8 @@ import {
   FontAwesome,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { Video, AVPlaybackStatus } from "expo-av";
 const { width, height } = Dimensions.get("screen");
-export default function VideoPage({ navigation, route }) {
-  const video = React.useRef(null);
-  const [status, setStatus] = React.useState({});
+export default function HistoryResult({ navigation }) {
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -31,7 +28,6 @@ export default function VideoPage({ navigation, route }) {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            paddingLeft: 29,
           }}
         >
           <TouchableOpacity
@@ -42,33 +38,29 @@ export default function VideoPage({ navigation, route }) {
           >
             <Entypo name="chevron-thin-left" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={styles.textTitle}>Video</Text>
-          <TouchableOpacity>
-            <MaterialCommunityIcons
-              name="clock-time-four-outline"
-              size={26}
-              color="#484848"
-            />
-          </TouchableOpacity>
+          <Text style={styles.textTitle}>History Result</Text>
+          <Text style={{ width: "10%" }}></Text>
         </View>
-        <View style={styles.viewPage}>
-          <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
-            Name of video
-          </Text>
-          <Video
-            ref={video}
-            style={styles.video}
-            source={{
-              uri: "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-            }}
-            onLoadStart={() => {
-              video.current.playAsync();
-            }}
-            useNativeControls
-            resizeMode="contain"
-            onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-          />
-        </View>
+        <FlatList
+          numColumns={1}
+          style={{}}
+          data={[{ h: 1 }]}
+          renderItem={({ item, index }) => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("HistoryResultEdit");
+                }}
+                style={styles.list}
+              >
+                <Text style={styles.textSubject}>Name of History</Text>
+                <Text style={styles.textDate}>
+                  Date : 24/11/2021 Time : 21:21
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
       </View>
     </View>
   );
@@ -86,24 +78,32 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingVertical: 25,
-    paddingRight: 29,
+    paddingHorizontal: 29,
   },
-  viewPage: {
-    backgroundColor: "#FFFFFF",
-    width: "100%",
-    height: "100%",
-    borderTopRightRadius: 50,
-    paddingHorizontal: 16,
-    paddingVertical: 19,
-    marginTop: 10,
-  },
-  video: { width: "100%", height: 200, borderRadius: 20 },
   textTitle: {
     fontSize: 18,
     fontFamily: "RobotoBold",
     color: "#484848",
-    width: "40%",
+    width: "60%",
     textAlign: "center",
     marginBottom: 10,
+  },
+  list: {
+    width: "100%",
+    height: 58,
+    backgroundColor: "rgba(255, 255, 255, 0.39)",
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    marginTop: 12,
+  },
+  textSubject: {
+    fontSize: 15,
+    fontFamily: "Roboto",
+    color: "#484848",
+  },
+  textDate: {
+    fontSize: 10,
+    fontFamily: "Roboto",
+    color: "#888888",
   },
 });

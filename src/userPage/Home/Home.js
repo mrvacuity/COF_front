@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,40 +12,45 @@ import {
   ScrollView,
 } from "react-native";
 import Unorderedlist from "react-native-unordered-list";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import { apiservice } from "../../service/api";
 const { width, height } = Dimensions.get("screen");
 export default function Home({ navigation }) {
-  const DATA1 = [
-    {
-      title: "Plant",
+  const [token, setToken] = useRecoilState(tokenState);
+  const [data, setData] = useState([]);
+  const [userData, setUserData] = useState();
+  console.log(userData);
+  useEffect(() => {
+    getLesson();
+    getProfile();
+  }, []);
+  const getLesson = async () => {
+    const res = await apiservice({
+      path: "/lesson/getalllesson",
+      method: "get",
+    });
 
-      detail1: [
-        { name: "Coffee plant species" },
-        { name: "How to plant and care" },
-      ],
-      img: require("../../img/beans.png"),
-    },
-    {
-      title: "How To Grow Coffee Plant",
-      detail1: [{ name: "Harvest methods" }, { name: " Processed" }],
-      img: require("../../img/basket.png"),
-    },
-    {
-      title: "Roasting",
+    if (res.status == 200) {
+      setData(res.data);
+    } else {
+    }
+  };
+  const getProfile = async () => {
+    const res = await apiservice({
+      path: "/authen/user",
+      method: "get",
+      token: token.accessToken,
+    });
 
-      detail1: [
-        { name: "Light loast" },
-        { name: "Medium loast" },
-        { name: "Dark loast" },
-      ],
-      img: require("../../img/bans.png"),
-    },
-    {
-      title: "Brew",
-
-      detail1: [{ name: "Moka Pot" }, { name: "Drip" }, { name: "Aeropress" }],
-      img: require("../../img/cold.png"),
-    },
-  ];
+    if (res.status == 200) {
+      setUserData(res.data.result);
+    } else {
+    }
+  };
+  if (userData == undefined) {
+    return <View></View>;
+  }
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -61,7 +66,7 @@ export default function Home({ navigation }) {
             <Text
               style={[styles.textRegular, { marginTop: 35, marginBottom: 8 }]}
             >
-              Welcome back, Bird!
+              {"Welcome back, " + userData.first_name + "!"}
             </Text>
             <Text style={styles.textLight}>Have you drunk yet?</Text>
             <Text style={[styles.textBold, { fontSize: 18, marginTop: 12 }]}>
@@ -71,13 +76,13 @@ export default function Home({ navigation }) {
 
           <FlatList
             numColumns={1}
-            style={{}}
-            data={DATA1}
+            style={{ marginBottom: 20 }}
+            data={data}
             renderItem={({ item, index }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("Pretest");
+                    navigation.navigate("Pretest", item);
                   }}
                   style={styles.viewHistory}
                 >
@@ -87,7 +92,7 @@ export default function Home({ navigation }) {
                     <FlatList
                       numColumns={1}
                       style={{ marginLeft: 10, marginVertical: 12 }}
-                      data={item.detail1}
+                      data={item.lesson}
                       renderItem={({ item, index }) => {
                         return (
                           <View>
@@ -98,13 +103,14 @@ export default function Home({ navigation }) {
                                   { fontSize: 13, color: "#484848" },
                                 ]}
                               >
-                                {item.name}
+                                {item.title}
                               </Text>
                             </Unorderedlist>
                           </View>
                         );
                       }}
                     />
+
                     <Text
                       style={[
                         styles.textLight,
@@ -122,10 +128,13 @@ export default function Home({ navigation }) {
                       Post-test: -
                     </Text>
                   </View>
+
                   <View style={styles.viewImgHistorty}>
                     <Image
                       style={{ width: 100, height: 100 }}
-                      source={item.img}
+                      source={{
+                        uri: item.image_url,
+                      }}
                     />
                     <View style={{ marginTop: 11 }}>
                       <Text
