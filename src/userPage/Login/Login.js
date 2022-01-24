@@ -123,7 +123,7 @@ export default function Login({ navigation }) {
     birth_date: "",
   });
   const [token, setState] = useRecoilState(tokenState);
-  console.log(token);
+
   const [loginBody, setLoginBody] = useState({
     username: "",
     password: "",
@@ -145,7 +145,7 @@ export default function Login({ navigation }) {
         base64: "data:image/png;base64," + result.base64,
       },
     });
-    console.log(res.data);
+
     if (res.status == 200) {
       setImage(result.uri);
       setRegisBody({
@@ -236,7 +236,7 @@ export default function Login({ navigation }) {
       </View>
     );
   }
-  console.log(regisBody);
+
   return (
     <View style={styles.container}>
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
@@ -495,7 +495,7 @@ export default function Login({ navigation }) {
                           color: "#484848",
                         }}
                       >
-                        {moment(showDate).format("DD-MM-YYYY")}
+                        {moment(selectDate).format("DD-MM-YYYY")}
                       </Text>
                     )}
                   </View>
@@ -655,8 +655,8 @@ export default function Login({ navigation }) {
               selectedDayColor="#F8831C"
               selectedDayTextColor="#FFFFFF"
               onDateChange={(day) => {
-                console.log(day);
                 // setday(day);
+                setSlectDate(day);
                 setShowDate(day);
                 setRegisBody({ ...regisBody, birth_date: day });
                 setModalVisible(!modalVisible);

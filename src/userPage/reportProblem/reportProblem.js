@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  Alert,
+  Modal,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -17,9 +19,29 @@ import {
   FontAwesome,
   MaterialIcons,
 } from "@expo/vector-icons";
-
+import { authActionReport } from "../../action/authAction";
+import { useRecoilState } from "recoil";
+import { tokenState } from "../../recoil/recoil";
 const { width, height } = Dimensions.get("screen");
 export default function reportProblem({ navigation }) {
+  const [token, setToken] = useRecoilState(tokenState);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [state, setState] = useState({ title: "", description: "" });
+
+  async function report() {
+    if (state.title != "" && state.description != "") {
+      const report = await authActionReport({
+        state,
+        token: token.accessToken,
+      });
+      if (report) {
+        setState({ title: "", description: "" });
+        setModalVisible(true);
+      }
+    } else {
+      Alert.alert("Please complete the information !");
+    }
+  }
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -46,18 +68,53 @@ export default function reportProblem({ navigation }) {
         <View style={{ alignSelf: "center" }}>
           <Text style={styles.textSuject}>Topic of problem.</Text>
           <TextInput
+            onChangeText={(text) => {
+              setState({ ...state, title: text });
+            }}
             placeholder="What went wrong?"
             style={styles.inputDetail}
           />
           <Text style={[styles.textSuject, { marginTop: 22 }]}>
             Please describe the problem.
           </Text>
-          <TextInput multiline style={styles.inputdescription} />
-          <TouchableOpacity style={styles.button}>
+          <TextInput
+            onChangeText={(text) => {
+              setState({ ...state, description: text });
+            }}
+            multiline
+            style={styles.inputdescription}
+          />
+          <TouchableOpacity onPress={report} style={styles.button}>
             <Text style={styles.textButton}>Submit</Text>
           </TouchableOpacity>
         </View>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.bgModal}>
+          <View style={[styles.viewDetailModal]}>
+            <Text style={styles.textButton}>Report success !</Text>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(!modalVisible);
+                navigation.goBack("");
+              }}
+              style={styles.buttonModal}
+            >
+              <Text style={[styles.textButton, { fontFamily: "Roboto" }]}>
+                Ok
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -109,6 +166,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     padding: 10,
     marginTop: 12,
+    textAlignVertical: "top",
     color: "#484848",
   },
   button: {
@@ -126,5 +184,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "RobotoLight",
     color: "#484848",
+  },
+  bgModal: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#000000bb",
+    justifyContent: "center",
+  },
+  viewDetailModal: {
+    width: "80%",
+    height: 119,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    alignSelf: "center",
+    alignItems: "center",
+    paddingVertical: 29,
+  },
+  buttonModal: {
+    width: 91,
+    height: 25,
+    backgroundColor: "#EDE8E6",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 19,
   },
 });

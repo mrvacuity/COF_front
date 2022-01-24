@@ -49,7 +49,7 @@ export default function Profile({ navigation }) {
     birth_date: "",
     about_me: "",
   });
-  console.log("state>>", state);
+
   const months = [
     "January",
     "February",
@@ -117,7 +117,6 @@ export default function Profile({ navigation }) {
         birth_date: res.data.result.birth_date,
         about_me: res.data.result.about_me,
       });
-      console.log(res.data.result);
     } else {
     }
   };
@@ -192,11 +191,24 @@ export default function Profile({ navigation }) {
 
         <View style={styles.viewProfile}>
           <Text style={styles.textSubject}>Name</Text>
-          <TextInput
-            editable={false}
-            defaultValue={userData.first_name + " " + userData.last_name}
-            style={styles.textDetail}
-          />
+          <View style={{ flexDirection: "row" }}>
+            <TextInput
+              editable={changeProfile ? true : false}
+              onChangeText={(text) => {
+                setState((val) => ({ ...val, first_name: text }));
+              }}
+              defaultValue={userData.first_name}
+              style={[styles.textDetail, { width: width * 0.25 }]}
+            />
+            <TextInput
+              editable={changeProfile ? true : false}
+              onChangeText={(text) => {
+                setState((val) => ({ ...val, last_name: text }));
+              }}
+              defaultValue={userData.last_name}
+              style={[styles.textDetail, { width: width * 0.25 }]}
+            />
+          </View>
         </View>
         <View style={styles.viewProfile}>
           <Text style={styles.textSubject}>Username</Text>
@@ -224,7 +236,7 @@ export default function Profile({ navigation }) {
             defaultValue={state.about_me}
             onChangeText={(text) => {
               setState((val) => ({ ...val, about_me: text }));
-              console.log(text.length);
+
               setTextLength(text.length);
             }}
             editable={changeProfile ? true : false}
@@ -311,7 +323,6 @@ export default function Profile({ navigation }) {
               selectedDayColor="#F8831C"
               selectedDayTextColor="#FFFFFF"
               onDateChange={(day) => {
-                console.log(day);
                 // setday(day);
                 setShowDate(day);
                 setState({ ...state, birth_date: day });

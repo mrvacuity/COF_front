@@ -75,12 +75,11 @@ export default function Camara({ navigation }) {
     const data = await cameraRef.current.takePictureAsync(options);
     const source = data.base64;
 
-    console.log("CCCCCCC", source);
     if (source) {
       await cameraRef.current.pausePreview();
       setIsPreview(true);
       setPage(2);
-      console.log(source);
+
       // let base64Img = `data:image/jpg;base64,${source}`;
       // let apiUrl =
       //   "https://api.cloudinary.com/v1_1/<your-cloud-name>/image/upload";

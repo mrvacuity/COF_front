@@ -53,3 +53,57 @@ export async function authActionResetPassword({ state, token }) {
     throw error;
   }
 }
+export async function authActionReport({ state, token }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/createreport",
+      method: "post",
+      body: state,
+      token: token,
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+export async function authActionComment({ state, token }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/createcomment",
+      method: "post",
+      body: state,
+      token: token,
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+export async function authActionCreateFeed({ state, token }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/createfeed",
+      method: "post",
+      body: state,
+      token: token,
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}

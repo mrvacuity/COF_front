@@ -18,9 +18,10 @@ import { apiservice } from "../../service/api";
 const { width, height } = Dimensions.get("screen");
 export default function Home({ navigation }) {
   const [token, setToken] = useRecoilState(tokenState);
+
   const [data, setData] = useState([]);
   const [userData, setUserData] = useState();
-  console.log(userData);
+
   useEffect(() => {
     getLesson();
     getProfile();
@@ -32,6 +33,7 @@ export default function Home({ navigation }) {
     });
 
     if (res.status == 200) {
+      console.log("lesson", res.data);
       setData(res.data);
     } else {
     }
@@ -133,7 +135,9 @@ export default function Home({ navigation }) {
                     <Image
                       style={{ width: 100, height: 100 }}
                       source={{
-                        uri: item.image_url,
+                        uri:
+                          "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                          item.image_url,
                       }}
                     />
                     <View style={{ marginTop: 11 }}>

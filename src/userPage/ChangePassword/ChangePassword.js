@@ -11,6 +11,7 @@ import {
   FlatList,
   ScrollView,
   Modal,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -54,6 +55,8 @@ export default function ChangePassword({ navigation }) {
       } else {
         setModalVisible(true);
       }
+    } else {
+      Alert.alert("Please complete the information !");
     }
   }
   return (

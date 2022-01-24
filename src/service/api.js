@@ -17,7 +17,7 @@ async function apiservice({ url, method, path, body, token }) {
       url: BaseUrl + path,
       headers: header,
     });
-    // console.log("responseAll", response);
+
     if (response.status == 200) {
       return {
         data: response.data,

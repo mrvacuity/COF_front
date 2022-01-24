@@ -11,6 +11,7 @@ import {
   FlatList,
   ScrollView,
   Modal,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -23,8 +24,38 @@ import {
   Ionicons,
   EvilIcons,
 } from "@expo/vector-icons";
+import moment from "moment";
+import { authActionComment } from "../../action/authAction";
+import { useRecoilState } from "recoil";
+import { tokenState } from "../../recoil/recoil";
 const { width, height } = Dimensions.get("screen");
-export default function ArticsDetail({ navigation }) {
+export default function ArticsDetail({ navigation, route }) {
+  const data = route.params;
+  const [token, setToken] = useRecoilState(tokenState);
+  const [state, setState] = useState({
+    comment: "",
+    feed_id: data.id,
+    uid: data.uid,
+  });
+  console.log("routeeeeeeeeeee", route.params);
+  console.log(state);
+  async function comment() {
+    if (state.comment != "") {
+      const comment = await authActionComment({
+        state,
+        token: token.accessToken,
+      });
+      if (comment) {
+        setState({ comment: "" });
+      }
+      if (!comment) {
+        Alert.alert("Error");
+      }
+    }
+  }
+  if (data == null) {
+    return null;
+  }
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -56,7 +87,7 @@ export default function ArticsDetail({ navigation }) {
                   color="#484848"
                 />
               </TouchableOpacity>
-              <TouchableOpacity style={{ marginLeft: 8 }} onPress={() => {}}>
+              <TouchableOpacity onPress={() => {}} style={{ marginLeft: 8 }}>
                 <AntDesign name="hearto" size={24} color="#484848" />
               </TouchableOpacity>
             </View>
@@ -71,32 +102,35 @@ export default function ArticsDetail({ navigation }) {
               <Text style={{ fontSize: 12, fontFamily: "RobotoBold" }}>
                 Author:
                 <Text style={{ fontFamily: "Roboto", color: "#484848" }}>
-                  Frank Rimes
+                  {data.user_model.first_name + " " + data.user_model.last_name}
                 </Text>
               </Text>
-              <Text style={styles.textRoboto}>Date:4/11/2564</Text>
+              <Text style={styles.textRoboto}>
+                Date:{moment(new Date(data.createdAt)).format("DD/MM/YYYY")}
+              </Text>
             </View>
             <Text
               style={[styles.textRoboto, { fontSize: 14, marginVertical: 20 }]}
             >
-              Dealing with imposter syndrome
+              {data.title}
             </Text>
             <Image
-              style={{ width: "100%", height: 184 }}
+              style={{ width: "100%", height: 184, backgroundColor: "#CCCCCC" }}
               source={{
-                uri: "https://s3-alpha-sig.figma.com/img/1eaa/f60a/29b4b470bd5e1022f81f8717c5653808?Expires=1642982400&Signature=LaZjOSjWqb1BYEexi665JAWinFNK2nUdAjsjpnUVEBIHnxXjUsN5w3UNVk2Kki9yJzpTUHc3YdaDam-6QvZfoXcfC4kpnQaNJ0mGivAn4k1Z1mhKzqbszaD23NBhYC1u6fuALDnOvqaZoqlQ3tUk~1AhPgj6ZHQTSGDCdNwjVBG6nSbqAWvTTKENy2oreK8xhhfxBWS4SCN7UNqp2zH777c0bFcjwTLf3sUhSsOddCd1kLoatGVDEawwtTVNgyqMvA1ARvG-Bdlv3jO7ccqLUKINZNBfyOcG54FZJY~~lzAOwS247ulVFy8MqDuDUiN-mREDeOdJON5bdIlpVPGu8g__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA",
+                uri:
+                  "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                  data.image_url,
               }}
             />
             <Text style={[styles.textLight, { marginVertical: 25 }]}>
-              Our light roast is medium brown in color and is the most acidic of
-              our offerings. There may be slight oil on a bean or two, but for
-              the most part, the beans are completely free of oil. We roast it
-              dark enough to remove some of the sourness that can come from an
+              {data.description}
             </Text>
             <Text style={styles.textComment}>Comment</Text>
             <View style={styles.viewInputComment}>
               <TextInput
+                onChangeText={(text) => setState({ ...state, comment: text })}
                 placeholder="Write a comment...."
+                value={state.comment}
                 style={[
                   styles.textLight,
                   {
@@ -106,14 +140,14 @@ export default function ArticsDetail({ navigation }) {
                   },
                 ]}
               />
-              <TouchableOpacity>
+              <TouchableOpacity onPress={comment}>
                 <Feather name="send" size={18} color="#484848" />
               </TouchableOpacity>
             </View>
             <FlatList
               numColumns={1}
               style={{ marginBottom: 20 }}
-              data={[{ n: 1 }, { n: 1 }]}
+              data={data.comment_model}
               renderItem={({ item, index }) => {
                 return (
                   <View style={styles.viewComment}>
@@ -126,14 +160,23 @@ export default function ArticsDetail({ navigation }) {
                           size={20}
                           color="#484848"
                         />
-                        <Text style={styles.textDate}>Frank Rimes</Text>
+                        <Text style={styles.textDate}>
+                          {" " +
+                            item.comment_models.first_name +
+                            " " +
+                            item.comment_models.last_name}
+                        </Text>
                       </View>
-                      <Text style={styles.textDate}>12/05/21 12:00 pm</Text>
+                      <Text style={styles.textDate}>
+                        {moment(new Date(item.createdAt)).format(
+                          "DD/MM/YYYY hh:ss"
+                        )}
+                      </Text>
                     </View>
                     <Text
                       style={[styles.textLight, { fontSize: 12, marginTop: 6 }]}
                     >
-                      Tanahair is the friendliest and most efficient
+                      {item.comment}
                     </Text>
                   </View>
                 );

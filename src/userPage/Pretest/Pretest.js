@@ -32,7 +32,7 @@ export default function Pretest({ navigation, route }) {
     lesson_id: route.params.id,
     score: "",
   });
-  console.log(state);
+
   useEffect(() => {
     conditions(token);
   }, []);
@@ -50,7 +50,6 @@ export default function Pretest({ navigation, route }) {
         token: token.accessToken,
       });
       if (send) {
-        console.log("OK");
         navigation.navigate("Lesson", route.params);
       }
     }
@@ -79,11 +78,9 @@ export default function Pretest({ navigation, route }) {
       } else {
         navigation.navigate("Lesson", route.params);
       }
-    } else {
     }
   };
   const choiceChangeHandler = (index, data) => {
-    // console.log("index \t", index);
     setChoiceIndex((preIndex) => index);
     setData(data);
   };

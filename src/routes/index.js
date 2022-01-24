@@ -28,13 +28,23 @@ import { useRecoilState } from "recoil";
 import HistoryResult from "../userPage/HistoryResult/HistoryResult";
 import HistoryResultEdit from "../userPage/HistoryResultEdit/HistoryResultEdit";
 import ArticsDetail from "../userPage/ArticlesDetail/ArticsDetail";
+import Favorite from "../userPage/Favorite/Favorite";
+import Post from "../userPage/Post/Post";
+import Menu from "../adminPage/Menu/Menu";
+import EditLesson from "../adminPage/EditLesson/EditLesson";
+import EditArticle from "../adminPage/EditArticle/EditArticle";
+import LessonList from "../adminPage/LessonList/LessonList";
+import NewLesson from "../adminPage/NewLesson/NewLesson";
+import EditTest from "../adminPage/EditTest/EditTest";
+import ExamTest from "../adminPage/ExamTest/ExamTest";
+import AddQuizTest from "../adminPage/AddQuizTest/AddQuizTest";
 const { width, height } = Dimensions.get("screen");
 
 const Stack = createStackNavigator();
 
 function main() {
   const [token, setToken] = useRecoilState(tokenState);
-  console.log(token);
+
   return (
     <Stack.Navigator headerMode="none" mode="modal" initialRouteName="Login">
       {token == "" ? (
@@ -52,6 +62,17 @@ function main() {
       <Stack.Screen name="HistoryResult" component={HistoryResult} />
       <Stack.Screen name="HistoryResultEdit" component={HistoryResultEdit} />
       <Stack.Screen name="ArticlesDetail" component={ArticsDetail} />
+      <Stack.Screen name="Favorite" component={Favorite} />
+      <Stack.Screen name="Post" component={Post} />
+
+      <Stack.Screen name="Menu" component={Menu} />
+      <Stack.Screen name="EditLesson" component={EditLesson} />
+      <Stack.Screen name="EditArticle" component={EditArticle} />
+      <Stack.Screen name="LessonList" component={LessonList} />
+      <Stack.Screen name="NewLesson" component={NewLesson} />
+      <Stack.Screen name="EditTest" component={EditTest} />
+      <Stack.Screen name="ExamTest" component={ExamTest} />
+      <Stack.Screen name="AddQuizTest" component={AddQuizTest} />
     </Stack.Navigator>
   );
 }

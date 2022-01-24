@@ -19,16 +19,28 @@ import {
 } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("screen");
 export default function Lesson({ navigation, route }) {
-  const [page, setPage] = useState(1);
+  //const [page, setPage] = useState(1);
   const [testLight, setTestLight] = useState(false);
   const [testMedium, setTestMedium] = useState(false);
   const [testDark, setTestDark] = useState(false);
   const data = route.params.lesson;
+  const [tab, setTab] = useState(0);
+  console.log(route.params);
+  if (data == null) {
+    return null;
+  }
   return (
     <View style={styles.container}>
       <SafeAreaView />
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
-      <ScrollView style={{ height: "100%", backgroundColor: "#f0e9e4" }}>
+      <ScrollView
+        style={{
+          minHeight: "100%",
+          backgroundColor: "#f0e9e4",
+          borderTopLeftRadius: 30,
+          borderTopRightRadius: 30,
+        }}
+      >
         <View style={[styles.viewDetail]}>
           <View
             style={{
@@ -58,7 +70,31 @@ export default function Lesson({ navigation, route }) {
               />
             </TouchableOpacity>
           </View>
-          <View style={{ flexDirection: "row", marginTop: 10 }}>
+          <View>
+            <FlatList
+              style={{}}
+              data={data}
+              horizontal
+              renderItem={({ item, index }) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setTab(index);
+                    }}
+                    style={[
+                      styles.selectPage2,
+                      {
+                        backgroundColor: index == tab ? "#FFFF" : "#f0e9e4",
+                      },
+                    ]}
+                  >
+                    <Text style={styles.textLight}>{item.title}</Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+          {/* <View style={{ flexDirection: "row", marginTop: 10 }}>
             <TouchableOpacity
               onPress={() => {
                 setPage(1);
@@ -108,55 +144,55 @@ export default function Lesson({ navigation, route }) {
             >
               <Text style={[styles.textLight]}>Dark</Text>
             </TouchableOpacity>
-          </View>
-          {page == 1 ? (
-            <View style={styles.viewPage}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  width: "120%",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
-                  {data[0].title}
-                </Text>
-                {testLight ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("Test");
-                    }}
-                    style={[styles.buttonTest, { width: 105 }]}
-                  >
-                    <Text style={styles.textLight}>{"Test >>>"}</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setTestLight((val) => !val);
-                    }}
-                    style={styles.buttonTest}
-                  >
-                    <Text style={styles.textLight}>{"<<<"}</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-              <Image
-                style={styles.viewImgCoffee}
-                source={{ uri: data[0].image_url }}
-              />
+          </View> */}
 
-              <Text style={styles.textLight}>{data[0].description}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("Video", route.params.lesson[0]);
-                }}
-                style={styles.buttonVideo}
-              >
-                <Text style={styles.textLight}>Video</Text>
-              </TouchableOpacity>
+          <View style={styles.viewPage}>
+            <View
+              style={{
+                flexDirection: "row",
+                width: "120%",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
+                {data[tab].title}
+              </Text>
+              {testMedium ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Test", route.params.id);
+                  }}
+                  style={[styles.buttonTest, { width: 105 }]}
+                >
+                  <Text style={styles.textLight}>{"Test >>>"}</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    setTestMedium((val) => !val);
+                  }}
+                  style={styles.buttonTest}
+                >
+                  <Text style={styles.textLight}>{"<<<"}</Text>
+                </TouchableOpacity>
+              )}
             </View>
-          ) : page == 2 ? (
+            <Image
+              style={styles.viewImgCoffee}
+              source={{ uri: data[tab].image_url }}
+            />
+            <Text style={styles.textLight}>{data[tab].description}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Video", route.params.lesson[tab]);
+              }}
+              style={styles.buttonVideo}
+            >
+              <Text style={styles.textLight}>Video</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* { page == 2 ? (
             <View style={styles.viewPage}>
               <View
                 style={{
@@ -246,7 +282,7 @@ export default function Lesson({ navigation, route }) {
                 </TouchableOpacity>
               </View>
             )
-          )}
+          )} */}
         </View>
       </ScrollView>
     </View>
@@ -289,12 +325,16 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   selectPage2: {
-    width: 113,
+    width: 83,
     height: 39,
-    borderTopRightRadius: 50,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+
     justifyContent: "center",
-    paddingLeft: 40,
-    marginLeft: -30,
+    alignItems: "center",
+    //borderWidth: 0.2,
+    //borderBottomWidth: 0,
+    // borderLeftWidth: 0,
     zIndex: 4,
   },
   viewPage: {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,30 +16,62 @@ import {
   Entypo,
   FontAwesome,
 } from "@expo/vector-icons";
+import { useRecoilState } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import { apiservice } from "../../service/api";
 const { width, height } = Dimensions.get("screen");
-export default function Test({ navigation }) {
-  const [bankIndex, setBankIndex] = useState(-1);
-  const [bank, setBank] = useState("");
-  const bankList = ["ธนาคารกสิกร", "ธนาคารกรุงไทย", "ธนาคารไทยพาณิชย์"];
-  const DATA = [
-    {
-      Q: "When we should to stopped if we want the light color?",
-      A: ["15 min", "End of first crack"],
-    },
-    {
-      Q: "If you want light roasted coffee beans, what temperature should you use?",
-      A: ["200 °F", "356 °F"],
-    },
-    {
-      Q: "If you want light roasted coffee beans, what temperature should you use?",
-      A: ["200 °F", "356 °F"],
-    },
-  ];
-  const bankChangeHandler = (index, data) => {
-    // console.log("index \t", index);
-    setBankIndex((preIndex) => index);
-    setBank(data);
+export default function Test({ navigation, route }) {
+  const [token, setToken] = useRecoilState(tokenState);
+  const [choiceIndex, setchoiceIndex] = useState(-1);
+  const [quiz, setQuiz] = useState([]);
+  const [choice, setchoice] = useState("");
+  const [ans, setAns] = useState([]);
+  const [state, setState] = useState({
+    Type: "POSTTEST",
+    lesson_id: route.params,
+    score: "",
+  });
+  const [status, setStatus] = useState(false);
+  useEffect(() => {
+    getTest();
+  }, []);
+  async function send() {
+    setStatus(true);
+    setState({
+      ...state,
+      score: (
+        (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
+        100
+      ).toFixed(),
+    });
+    if (state.score != "") {
+      const send = await authActionScore({
+        state,
+        token: token.accessToken,
+      });
+      if (send) {
+        console.log("GG");
+      }
+    }
+  }
+  const getTest = async () => {
+    const res = await apiservice({
+      path: "/lesson/gettest/" + route.params,
+      method: "get",
+    });
+
+    if (res.status == 200) {
+      setQuiz(res.data.data);
+    } else {
+      console.log("error");
+    }
   };
+
+  const choiceChangeHandler = (index, data) => {
+    setchoiceIndex((preIndex) => index);
+    setchoice(data);
+  };
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -52,25 +84,56 @@ export default function Test({ navigation }) {
           >
             LIGHT ROAST
           </Text>
+          {status && (
+            <Text
+              style={[
+                styles.textTitle,
+                { width: "100%", textAlign: "left", fontFamily: "RobotoBold" },
+              ]}
+            >
+              Score: {ans.filter((e) => e.myAns == e.Answer).length.toFixed()}/
+              {quiz.length}
+            </Text>
+          )}
           <FlatList
             numColumns={1}
             style={{}}
-            data={DATA}
+            data={quiz}
             renderItem={({ item, index }) => {
               return (
-                <View style={{ borderBottomWidth: 0.5, paddingVertical: 17 }}>
+                <View
+                  style={{
+                    borderBottomWidth: 0.5,
+                    paddingVertical: 17,
+                  }}
+                >
                   <Text style={[styles.textLight, { marginBottom: 11 }]}>
-                    {item.Q}
+                    {item.title}
                   </Text>
-                  {item.A.map((data, index) => (
+                  {item.choice.map((data, indexs) => (
                     <TouchableOpacity
                       key={data}
-                      style={styles.buttonSelect}
-                      onPress={bankChangeHandler.bind(this, index, data)}
+                      style={[styles.buttonSelect, {}]}
+                      onPress={() => {
+                        setAns((val) => {
+                          return val.filter((e) => e.number != index);
+                        });
+                        setAns((val) =>
+                          val.concat({
+                            number: index,
+                            myAns: data,
+                            Answer: item.answer,
+                          })
+                        );
+                      }}
                     >
                       <FontAwesome
                         name={
-                          index === bankIndex ? "dot-circle-o" : "circle-thin"
+                          ans.filter(
+                            (e) => e.myAns == data && e.number == index
+                          ).length > 0
+                            ? "dot-circle-o"
+                            : "circle-thin"
                         }
                         size={14}
                         color="#484848"
@@ -92,18 +155,28 @@ export default function Test({ navigation }) {
           />
         </View>
         <View style={{ height: height * 0.06 }}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("MyTabs");
-            }}
-            style={styles.buttonDone}
-          >
-            <Text
-              style={{ fontSize: 18, fontFamily: "Roboto", color: "#484848" }}
+          {!status ? (
+            <TouchableOpacity onPress={send} style={styles.buttonDone}>
+              <Text
+                style={{ fontSize: 18, fontFamily: "Roboto", color: "#484848" }}
+              >
+                Done
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Home");
+              }}
+              style={[styles.buttonDone, { width: 154 }]}
             >
-              Done
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{ fontSize: 18, fontFamily: "Roboto", color: "#484848" }}
+              >
+                Back to lesson
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>
