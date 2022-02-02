@@ -18,8 +18,10 @@ import {
 const { width, height } = Dimensions.get("screen");
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as Google from "expo-google-app-auth";
-import * as Facebook from "expo-facebook";
+import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
+import * as Google from "expo-auth-session/providers/google";
+import { ResponseType } from "expo-auth-session";
+import * as Facebook from "expo-auth-session/providers/facebook";
 import CalendarPicker from "react-native-calendar-picker";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
@@ -125,44 +127,56 @@ export default function Login({ navigation }) {
     birth_date: "",
   });
   const [token, setState] = useRecoilState(tokenState);
-  async function logInFacebook() {
-    try {
-      await Facebook.initializeAsync({
-        appId: "<APP_ID>",
-      });
-      const { type, token, expirationDate, permissions, declinedPermissions } =
-        await Facebook.logInWithReadPermissionsAsync({
-          permissions: ["public_profile"],
-        });
-      if (type === "success") {
-        // Get the user's name using Facebook's Graph API
-        const response = await fetch(
-          `https://graph.facebook.com/me?access_token=${token}`
-        );
-        Alert.alert("Logged in!", `Hi ${(await response.json()).name}!`);
-      } else {
-        // type === 'cancel'
-      }
-    } catch ({ message }) {
-      alert(`Facebook Login Error: ${message}`);
-    }
-  }
-  const signInAsync = async () => {
-    try {
-      const { type, user } = await Google.logInAsync({
-        iosClientId: `664664474549-oulrrhiifll6blfgrq6n766a06ik9jsu.apps.googleusercontent.com`,
-        androidClientId: `664664474549-oulrrhiifll6blfgrq6n766a06ik9jsu.apps.googleusercontent.com`,
-      });
 
-      if (type === "success") {
-        // Then you can use the Google REST API
-        console.log(" success, navigating to profile");
-        // navigation.navigate("Profile", { user });
-      }
-    } catch (error) {
-      console.log(" error with login", error);
-    }
+  //twitter
+  const useProxy = Platform.select({ web: false, default: true });
+  const discovery = {
+    authorizationEndpoint: "https://twitter.com/i/oauth2/authorize",
+    tokenEndpoint: "https://twitter.com/i/oauth2/token",
+    revocationEndpoint: "https://twitter.com/i/oauth2/revoke",
   };
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: "CLIENT_ID",
+      redirectUri: makeRedirectUri({
+        scheme: "your.app",
+        useProxy,
+      }),
+      usePKCE: true,
+      scopes: ["tweet.read"],
+    },
+    discovery
+  );
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { code } = response.params;
+    }
+  }, [response]);
+
+  //Facebook
+  const [request2, response2, promptAsync2] = Facebook.useAuthRequest({
+    clientId: "<YOUR FBID>",
+    responseType: ResponseType.Code,
+  });
+  useEffect(() => {
+    if (response2?.type === "success") {
+      const { code2 } = response2.params;
+    }
+  }, [response2]);
+
+  //Google
+  const [request1, response1, promptAsync1] = Google.useAuthRequest({
+    expoClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+    iosClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+    androidClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+    webClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+  });
+  useEffect(() => {
+    if (response1?.type === "success") {
+      const { code1 } = response1.params;
+    }
+  }, [response1]);
+
   const [loginBody, setLoginBody] = useState({
     username: "",
     password: "",
@@ -251,14 +265,21 @@ export default function Login({ navigation }) {
   function LoginSocial() {
     return (
       <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity onPress={signInAsync} style={styles.buttonSocial}>
+        <TouchableOpacity
+          onPress={() => {
+            promptAsync1();
+          }}
+          style={styles.buttonSocial}
+        >
           <Image
             style={{ width: 20, height: 15 }}
             source={require("../../img/mail.png")}
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={logInFacebook}
+          onPress={() => {
+            promptAsync2();
+          }}
           style={[styles.buttonSocial, { marginHorizontal: 7 }]}
         >
           <Image
@@ -266,7 +287,13 @@ export default function Login({ navigation }) {
             source={require("../../img/facebook.png")}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonSocial}>
+        <TouchableOpacity
+          disabled={!request}
+          onPress={() => {
+            promptAsync({ useProxy });
+          }}
+          style={styles.buttonSocial}
+        >
           <Image
             style={{ width: 20, height: 16.24 }}
             source={require("../../img/twitter.png")}
@@ -582,26 +609,7 @@ export default function Login({ navigation }) {
                   <Text style={styles.textButton}>Create account</Text>
                 </TouchableOpacity>
                 <View style={{ flexDirection: "row", alignSelf: "center" }}>
-                  <TouchableOpacity style={styles.buttonSocial}>
-                    <Image
-                      style={{ width: 20, height: 15 }}
-                      source={require("../../img/mail.png")}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.buttonSocial, { marginHorizontal: 7 }]}
-                  >
-                    <Image
-                      style={{ width: 20, height: 20 }}
-                      source={require("../../img/facebook.png")}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.buttonSocial}>
-                    <Image
-                      style={{ width: 20, height: 16.24 }}
-                      source={require("../../img/twitter.png")}
-                    />
-                  </TouchableOpacity>
+                  <LoginSocial />
                 </View>
                 <TouchableOpacity
                   onPress={() => {
