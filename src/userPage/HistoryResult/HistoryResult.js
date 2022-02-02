@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,8 +17,34 @@ import {
   FontAwesome,
   MaterialIcons,
 } from "@expo/vector-icons";
+import { apiservice } from "../../service/api";
+import { useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import moment from "moment";
+import { useIsFocused } from "@react-navigation/native";
 const { width, height } = Dimensions.get("screen");
 export default function HistoryResult({ navigation }) {
+  const token = useRecoilValue(tokenState);
+  const [data, setData] = useState([]);
+  const focus = useIsFocused();
+
+  useEffect(() => {
+    name();
+  }, [focus]);
+
+  async function name() {
+    const res = await apiservice({
+      path: "/lesson/getallhistory",
+      method: "get",
+      token: token.accessToken,
+    });
+
+    if (res.status == 200) {
+      console.log(res.data);
+      setData(res.data);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -44,18 +70,21 @@ export default function HistoryResult({ navigation }) {
         <FlatList
           numColumns={1}
           style={{}}
-          data={[{ h: 1 }]}
+          data={data.sort((a, b) => b.id - a.id)}
           renderItem={({ item, index }) => {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("HistoryResultEdit");
+                  navigation.navigate("HistoryResultEdit", item);
                 }}
                 style={styles.list}
               >
-                <Text style={styles.textSubject}>Name of History</Text>
+                <Text style={styles.textSubject}>
+                  pH{parseFloat(item?.Sour)?.toFixed(2)}
+                </Text>
                 <Text style={styles.textDate}>
-                  Date : 24/11/2021 Time : 21:21
+                  Date : {moment(item?.createdAt).format("DD/MM/YYYY")} Time :{" "}
+                  {moment(item?.createdAt).format("HH:mm")}
                 </Text>
               </TouchableOpacity>
             );

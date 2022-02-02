@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -17,8 +18,15 @@ import {
   FontAwesome,
   MaterialIcons,
 } from "@expo/vector-icons";
+import moment from "moment";
+import { apiservice } from "../../service/api";
+import { useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
 const { width, height } = Dimensions.get("screen");
-export default function HistoryResultEdit({ navigation }) {
+export default function HistoryResultEdit({ navigation, route }) {
+  const [description, setdescription] = useState(route?.params?.description);
+  const token = useRecoilValue(tokenState);
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -46,21 +54,26 @@ export default function HistoryResultEdit({ navigation }) {
           <Image
             style={{ width: "100%", height: 353, marginBottom: 10 }}
             source={{
-              uri: "https://s3-alpha-sig.figma.com/img/7785/fe29/12c094f4edc7074dbc18945d97b2d09b?Expires=1642982400&Signature=aq7L207H~YTDhdc6RWcVRax-GiA68Kx5NzHWT5qvSG~xLb01gU8JVn1oQe9n2B22y8UnN~waazPcoV7YKGotxvP3SdemnFlK2OP6ljHNjrLw0nibRxamA9a3YV1BK87SXim3Omp5ui0AmJtjwSjzdwn0SOMzmZJq6i9jxCokgqgcXwwBBAt5XKgAj-HthwQHeru0IQwT5XBdFLL1SYhrNzA13Y00V~Pcnnyv5~bsCrbuspw6XNLtYl3ibphwdcik~ZVqcrXVvpZq~Jfqzisu1x6Id~H2UrBVOW-BUqZF9EVzOrxfopBm5wPn9Lyh39wwy-WpxR2ki9rzcNNaAS8vjg__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA",
+              uri:
+                "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                route?.params?.image_url?.replace(".png", ""),
             }}
           />
           <View style={{ paddingHorizontal: 24 }}>
             <View style={styles.viewTopic}>
               <Text style={styles.textSuject}>Result</Text>
               <Text style={styles.textDate}>
-                Date : 24/11/2021 Time : 21:21
+                Date : {moment(route?.params?.createdAt).format("DD/MM/YYYY")}{" "}
+                Time : {moment(route?.params?.createdAt).format("HH:mm")}
               </Text>
             </View>
             <View style={styles.viewTopic}>
               <Text style={styles.textSujectLight}>Sour</Text>
-              <Text style={styles.textSujectLight}>pH6.3</Text>
+              <Text style={styles.textSujectLight}>
+                pH{parseFloat(route?.params?.Sour)?.toFixed(2)}
+              </Text>
             </View>
-            <View style={styles.viewTopic}>
+            {/* <View style={styles.viewTopic}>
               <Text style={styles.textSujectLight}>Sweetness</Text>
               <Text style={styles.textSujectLight}>20 brix</Text>
             </View>
@@ -69,17 +82,37 @@ export default function HistoryResultEdit({ navigation }) {
                 Total dissolved solids (TDS)
               </Text>
               <Text style={styles.textSujectLight}>40 ppm</Text>
-            </View>
+            </View> */}
             <Text style={[styles.textSuject, { color: "#000", marginTop: 34 }]}>
               Description
             </Text>
             <TextInput
+              defaultValue={description}
+              onChangeText={setdescription}
               placeholder="Enter your description"
               placeholderTextColor={"#484848"}
               multiline
               style={[styles.textSuject, styles.input]}
             />
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity
+              onPress={async () => {
+                const res = await apiservice({
+                  path: "/lesson/updatehistory",
+                  method: "put",
+                  body: {
+                    ...route.params,
+                    description,
+                  },
+                  token: token.accessToken,
+                });
+
+                if (res.status == 200) {
+                  Alert.alert("Update success");
+                  navigation.goBack();
+                }
+              }}
+              style={styles.button}
+            >
               <Text style={[styles.textSujectLight, { fontSize: 14 }]}>
                 Save
               </Text>

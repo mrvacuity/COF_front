@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -22,8 +22,34 @@ import {
   Ionicons,
   EvilIcons,
 } from "@expo/vector-icons";
+import { apiservice } from "../../service/api";
+import { useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import { useIsFocused } from "@react-navigation/native";
+import moment from "moment";
 const { width, height } = Dimensions.get("screen");
 export default function Favorite({ navigation }) {
+  const token = useRecoilValue(tokenState);
+  const focus = useIsFocused();
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (focus) {
+      name();
+    }
+  }, [focus]);
+
+  async function name() {
+    const res = await apiservice({
+      path: "/lesson/alllike",
+      token: token.accessToken,
+    });
+
+    if (res.status == 200) {
+      setData(res.data.data);
+    }
+  }
+  console.log("222222222", data);
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -48,21 +74,32 @@ export default function Favorite({ navigation }) {
         </View>
         <FlatList
           numColumns={1}
-          style={{}}
-          data={[{ n: 1 }]}
+          style={{ marginBottom: 20 }}
+          data={data}
           renderItem={({ item, index }) => {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("ArticlesDetail");
+                  navigation.navigate("ArticlesDetail", {
+                    ...item,
+                    ...item.info,
+                    comment_model: item.comment_models,
+                  });
                 }}
                 style={styles.buttonDetail}
               >
                 <View style={{ width: "35%" }}>
                   <Image
-                    style={{ width: 103, height: 103, borderRadius: 15 }}
+                    style={{
+                      width: 103,
+                      height: 103,
+                      borderRadius: 15,
+                      backgroundColor: "#ccc",
+                    }}
                     source={{
-                      uri: "https://s3-alpha-sig.figma.com/img/0b78/bc4e/d3fe54cf10398ded53d27d28d8f232a9?Expires=1642982400&Signature=Esc91X7XNwTELGtsMgkaRMIT3O210~TVLe4StAWpXNDcsxgk34PbDAGIWg~4k07DrziTKwf3jHvhXiinXYDNBmCF6rcBYN6FeAabZLLV~tY5aioSDe2XnVKexa~-U3kMGfujDLGmOqwUYNTmccNvWLXVc72~RFjedtluAMyycpD6q2B0EBKFGyerwt6rYP4D1ek~cYWSY1knenDoIAoPOJc~yBPflvSnExKjtaImWxro0i6tMBjE~oOHxbdQ4Qjla32EHOhDCEDL4jVYqVbD6cU7CnYL4kylDnjUk0slgIVNiJnsdVeqvdeTDPEFUqtAo5C4rYm5IFYOaFQ3ats8bw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA",
+                      uri:
+                        "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                        item?.info?.image_url,
                     }}
                   />
                 </View>
@@ -82,13 +119,15 @@ export default function Favorite({ navigation }) {
                       >
                         ● Coffee
                       </Text>
-                      <Text style={styles.textDate}>4/11/2564</Text>
+                      <Text style={styles.textDate}>
+                        {moment(item.createdAt).format("DD/MM/YYYY")}
+                      </Text>
                     </View>
                     <Text
                       numberOfLines={3}
                       style={[styles.textDetail, { fontSize: 16 }]}
                     >
-                      About the new art deco for designers and artists
+                      {item?.info?.title}
                     </Text>
                   </View>
                 </View>

@@ -24,10 +24,11 @@ import {
   Ionicons,
   EvilIcons,
 } from "@expo/vector-icons";
-import { getFeed } from "../../action/authAction";
+import { authActionDeleteFeed, getFeed } from "../../action/authAction";
 import { useRecoilState } from "recoil";
 import { tokenState } from "../../recoil/recoil";
 import { apiservice } from "../../service/api";
+import { useIsFocused } from "@react-navigation/native";
 import moment from "moment";
 const { width, height } = Dimensions.get("screen");
 export default function Articles({ navigation }) {
@@ -37,11 +38,25 @@ export default function Articles({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState([]);
   const [myData, setMyData] = useState([]);
-  useEffect(() => {
-    getFeed(token);
-    getMyFeed(token);
-  }, [token]);
+  const [search, setSearch] = useState("");
+  const [id_feed, setId_feed] = useState();
 
+  const isfocused = useIsFocused();
+  useEffect(() => {
+    if (isfocused) {
+      getFeed(token);
+      getMyFeed(token);
+    }
+  }, [isfocused]);
+  async function deleteFeed() {
+    const del = await authActionDeleteFeed({
+      id: id_feed,
+    });
+    if (del) {
+      setModalVisible(!modalVisible);
+      getMyFeed(token);
+    }
+  }
   const getFeed = async () => {
     const res = await apiservice({
       path: "/lesson/getallfeed",
@@ -61,13 +76,11 @@ export default function Articles({ navigation }) {
     });
 
     if (res.status == 200) {
-      console.log(res.data);
+      setId_feed(res.data.id);
       setMyData(res.data);
     }
-    if (res.status == 500) {
-      Alert.alert("API ERROR");
-    }
   };
+
   if (data[0] == null) {
     return null;
   }
@@ -105,8 +118,8 @@ export default function Articles({ navigation }) {
           <View style={styles.viewPage}>
             <TouchableOpacity
               onPress={() => {
-                getFeed(token);
                 setPage(1);
+                getFeed(token);
               }}
               style={[
                 styles.buttonPage,
@@ -117,7 +130,6 @@ export default function Articles({ navigation }) {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                getMyFeed(token);
                 setPage(2);
               }}
               style={[
@@ -136,47 +148,70 @@ export default function Articles({ navigation }) {
                   Today, {moment(new Date()).format("MMMM DD")}
                 </Text>
               </View>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("ArticlesDetail", data[0]);
+              <FlatList
+                numColumns={1}
+                style={{}}
+                data={data.sort(
+                  (a, b) => b.like_models.length - a.like_models.length
+                )}
+                renderItem={({ item, index }) => {
+                  return (
+                    index == 0 && (
+                      <View>
+                        <TouchableOpacity
+                          onPress={() => {
+                            navigation.navigate("ArticlesDetail", item);
+                          }}
+                        >
+                          <Image
+                            style={styles.imgPopular}
+                            source={{
+                              uri:
+                                item.image_url != null &&
+                                "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                                  item.image_url,
+                            }}
+                          />
+                        </TouchableOpacity>
+                        <Text style={styles.textsubjectPopular}>
+                          {item.title}
+                        </Text>
+                        <View style={{ flexDirection: "row", marginTop: 8 }}>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <MaterialCommunityIcons
+                              name="face-outline"
+                              size={20}
+                              color="#484848"
+                            />
+                            <Text style={styles.textPopular}>
+                              {" "}
+                              {item.user_model.first_name +
+                                " " +
+                                item.user_model.last_name}
+                            </Text>
+                          </View>
+                          <View style={styles.viewComment}>
+                            <Image
+                              style={{ width: 18, height: 18 }}
+                              source={require("../../img/chat.png")}
+                            />
+                            <Text style={styles.textPopular}>
+                              {" "}
+                              {item.comment_model.length} comments
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    )
+                  );
                 }}
-              >
-                <Image
-                  style={styles.imgPopular}
-                  source={{
-                    uri:
-                      "https://api-cof.wishesexistence.co/api/image/getimage/" +
-                        data[0] !=
-                        null && data[0].image_url,
-                  }}
-                />
-              </TouchableOpacity>
-              <Text style={styles.textsubjectPopular}>{data[0].title}</Text>
-              <View style={{ flexDirection: "row", marginTop: 8 }}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <MaterialCommunityIcons
-                    name="face-outline"
-                    size={20}
-                    color="#484848"
-                  />
-                  <Text style={styles.textPopular}>
-                    {" "}
-                    {data[0].user_model.first_name +
-                      " " +
-                      data[0].user_model.last_name}
-                  </Text>
-                </View>
-                <View style={styles.viewComment}>
-                  <Image
-                    style={{ width: 18, height: 18 }}
-                    source={require("../../img/chat.png")}
-                  />
-                  <Text style={styles.textPopular}>
-                    {" "}
-                    {data[0].comment_model.length} comments
-                  </Text>
-                </View>
-              </View>
+              />
+
               <View
                 style={{
                   flexDirection: "row",
@@ -187,14 +222,19 @@ export default function Articles({ navigation }) {
                 <Text style={styles.textsubject}>Articles</Text>
                 <View style={{ width: "55%" }}>
                   <View style={styles.viewArticles}>
-                    <TextInput placeholder="Search" style={styles.search} />
-                    <TouchableOpacity>
-                      <MaterialCommunityIcons
-                        name="magnify"
-                        size={24}
-                        color="#484848"
-                      />
-                    </TouchableOpacity>
+                    <TextInput
+                      onChangeText={(text) => {
+                        setSearch(text);
+                      }}
+                      placeholder="Search"
+                      style={styles.search}
+                    />
+
+                    <MaterialCommunityIcons
+                      name="magnify"
+                      size={24}
+                      color="#484848"
+                    />
 
                     <TouchableOpacity
                       onPress={() => {
@@ -210,13 +250,40 @@ export default function Articles({ navigation }) {
                   </View>
                   {fillter && (
                     <View style={styles.viewFillter}>
-                      <TouchableOpacity style={styles.buttonFillter}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          // console.log(data);
+
+                          // const a = data.filter((a, b) => {
+                          //   console.log("AAAA", a.comment_model);
+                          //   return (
+                          //     b.comment_model.length - a.comment_model.length
+                          //   );
+                          // });
+                          // console.log(a);
+                          // setData(a);
+
+                          // setData(a);
+                          setFillter(false);
+                        }}
+                        style={styles.buttonFillter}
+                      >
                         <Text style={styles.textFillter}>Most like</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.buttonFillter}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setFillter(false);
+                        }}
+                        style={styles.buttonFillter}
+                      >
                         <Text style={styles.textFillter}>Latest post</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.buttonFillter}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setFillter(false);
+                        }}
+                        style={styles.buttonFillter}
+                      >
                         <Text style={styles.textFillter}>Oldest post</Text>
                       </TouchableOpacity>
                     </View>
@@ -226,11 +293,19 @@ export default function Articles({ navigation }) {
               <FlatList
                 numColumns={1}
                 style={{ marginBottom: 40 }}
-                data={data}
+                data={data.filter((item) => {
+                  return item.title.includes(search);
+                })}
+                // .filter((item) => {
+                //   return (
+                //     item.user_info.username.includes(search) ||
+                //     item.user_info.fristname.includes(search)
+                //   );
+                // })
                 renderItem={({ item, index }) => {
                   return (
-                    <View>
-                      {index != 0 && (
+                    index > 0 && (
+                      <View>
                         <TouchableOpacity
                           onPress={() => {
                             navigation.navigate("ArticlesDetail", item);
@@ -341,25 +416,25 @@ export default function Articles({ navigation }) {
                             </View>
                           </View>
                         </TouchableOpacity>
-                      )}
-                    </View>
+                      </View>
+                    )
                   );
                 }}
               />
             </View>
           )}
           {page == 2 && (
-            <View style={{ minHeight: height * 0.8 }}>
+            <View style={{ minHeight: height * 0.7 }}>
               <View
                 style={{
                   paddingHorizontal: 12,
-                  minHeight: height * 0.5,
+                  minHeight: height * 0.6,
                 }}
               >
                 <View>
                   <FlatList
                     numColumns={1}
-                    data={myData}
+                    data={myData.sort((a, b) => b.id - a.id)}
                     renderItem={({ item, index }) => {
                       return (
                         <TouchableOpacity
@@ -437,6 +512,7 @@ export default function Articles({ navigation }) {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                   onPress={() => {
+                                    setId_feed(item.id);
                                     setModalVisible(true);
                                   }}
                                 >
@@ -508,9 +584,7 @@ export default function Articles({ navigation }) {
               </Text>
               <View style={{ flexDirection: "row" }}>
                 <TouchableOpacity
-                  onPress={() => {
-                    setModalVisible(!modalVisible);
-                  }}
+                  onPress={deleteFeed}
                   style={styles.buttonModal}
                 >
                   <Text style={[styles.textButton, { fontFamily: "Roboto" }]}>

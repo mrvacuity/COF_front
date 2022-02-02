@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -28,6 +29,8 @@ export default function Pretest({ navigation, route }) {
   const [quiz, setQuiz] = useState([]);
   const [check, setCheck] = useState();
   const [ans, setAns] = useState([]);
+  console.log(ans.length);
+  console.log(quiz.length);
   const [state, setstate] = useState({
     lesson_id: route.params.id,
     score: "",
@@ -37,21 +40,25 @@ export default function Pretest({ navigation, route }) {
     conditions(token);
   }, []);
   async function send() {
-    setstate({
-      ...state,
-      score: (
-        (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
-        100
-      ).toFixed(),
-    });
-    if (state.score != "") {
-      const send = await authActionScore({
-        state,
-        token: token.accessToken,
+    if (ans.length == quiz.length) {
+      setstate({
+        ...state,
+        score: (
+          (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
+          100
+        ).toFixed(),
       });
-      if (send) {
-        navigation.navigate("Lesson", route.params);
+      if (state.score != "") {
+        const send = await authActionScore({
+          state,
+          token: token.accessToken,
+        });
+        if (send) {
+          navigation.navigate("Lesson", route.params);
+        }
       }
+    } else {
+      Alert.alert("Please answer all of the following questions.");
     }
   }
   const getPreTest = async () => {

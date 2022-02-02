@@ -24,7 +24,10 @@ import {
 } from "@expo/vector-icons";
 import { useRecoilState } from "recoil";
 import { tokenState } from "../../recoil/recoil";
-import { authActionCreateFeed } from "../../action/authAction";
+import {
+  authActionCreateFeed,
+  authActionEditFeed,
+} from "../../action/authAction";
 import * as ImagePicker from "expo-image-picker";
 import { apiservice } from "../../service/api";
 const { width, height } = Dimensions.get("screen");
@@ -32,20 +35,50 @@ export default function Post({ navigation, route }) {
   const [token, setToken] = useRecoilState(tokenState);
   console.log("route++", route.params);
   const data = route.params;
-
+  const [id, setId] = useState(route.params);
   const [image, setImage] = useState(null);
   const [state, setState] = useState({
-    image_url: data.image_url,
-    title: data.title,
-    description: data.description,
+    image_url: route.params != undefined ? data.image_url : "",
+    title: route.params != undefined ? data.title : "",
+    description: route.params != undefined ? data.description : "",
+    id: route.params != undefined && data.id,
   });
+  const [body, setbody] = useState({
+    image_url: "",
+    title: "",
+    description: "",
+  });
+
   async function post() {
-    if (state.title != "" && state.description != "" && state.image_url != "") {
+    if (body.title != "" && body.description != "" && body.image_url != "") {
+      delete body.id;
+      console.log("OKK", body);
       const post = await authActionCreateFeed({
+        state: body,
+        token: token.accessToken,
+      });
+
+      if (post) {
+        setbody({
+          image_url: "",
+          title: "",
+          description: "",
+        });
+        navigation.navigate("Articles");
+      }
+      if (!comment) {
+        Alert.alert("Error");
+      }
+    }
+  }
+  console.log("gggggg", body);
+  async function postEdit() {
+    if (state.title != "" && state.description != "" && state.image_url != "") {
+      const edit = await authActionEditFeed({
         state,
         token: token.accessToken,
       });
-      if (post) {
+      if (edit) {
         setState({
           image_url: "",
           title: "",
@@ -83,10 +116,14 @@ export default function Post({ navigation, route }) {
         ...state,
         image_url: res.data.imageRefId.replace(".png", ""),
       });
+      setbody({
+        ...state,
+        image_url: res.data.imageRefId.replace(".png", ""),
+      });
     } else {
     }
   };
-  console.log(state);
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -114,6 +151,7 @@ export default function Post({ navigation, route }) {
             value={state.title}
             onChangeText={(text) => {
               setState({ ...state, title: text });
+              setbody({ ...state, title: text });
             }}
             placeholder="Enter your topic"
             placeholderTextColor={"#484848"}
@@ -146,15 +184,22 @@ export default function Post({ navigation, route }) {
             value={state.description}
             onChangeText={(text) => {
               setState({ ...state, description: text });
+              setbody({ ...state, description: text });
             }}
             multiline
             placeholder="Enter your article"
             placeholderTextColor={"#484848"}
             style={styles.inputArticle}
           />
-          <TouchableOpacity onPress={post} style={styles.buttonPost}>
-            <Text style={styles.text}>Post</Text>
-          </TouchableOpacity>
+          {route.params == undefined ? (
+            <TouchableOpacity onPress={post} style={styles.buttonPost}>
+              <Text style={styles.text}>Post</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={postEdit} style={styles.buttonPost}>
+              <Text style={styles.text}>Edit</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>

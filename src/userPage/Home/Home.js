@@ -15,17 +15,24 @@ import Unorderedlist from "react-native-unordered-list";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { tokenState } from "../../recoil/recoil";
 import { apiservice } from "../../service/api";
+import { useIsFocused } from "@react-navigation/native";
 const { width, height } = Dimensions.get("screen");
 export default function Home({ navigation }) {
   const [token, setToken] = useRecoilState(tokenState);
 
   const [data, setData] = useState([]);
-  const [userData, setUserData] = useState();
+  const [score, setScore] = useState([]);
 
+  const [userData, setUserData] = useState();
+  const isfocused = useIsFocused();
   useEffect(() => {
-    getLesson();
-    getProfile();
-  }, []);
+    if (isfocused) {
+      getLesson();
+      getProfile();
+      getScore(token);
+    }
+  }, [isfocused]);
+
   const getLesson = async () => {
     const res = await apiservice({
       path: "/lesson/getalllesson",
@@ -33,9 +40,21 @@ export default function Home({ navigation }) {
     });
 
     if (res.status == 200) {
-      console.log("lesson", res.data);
+      console.log("lessonn", res.data.lesson);
       setData(res.data);
     } else {
+    }
+  };
+
+  const getScore = async () => {
+    const res = await apiservice({
+      path: "/lesson/score",
+      method: "get",
+      token: token.accessToken,
+    });
+
+    if (res.status == 200) {
+      setScore(res.data);
     }
   };
   const getProfile = async () => {
@@ -50,7 +69,14 @@ export default function Home({ navigation }) {
     } else {
     }
   };
+
+  console.log(score);
+
   if (userData == undefined) {
+    return <View></View>;
+  }
+
+  if (score == undefined) {
     return <View></View>;
   }
   return (
@@ -80,6 +106,7 @@ export default function Home({ navigation }) {
             numColumns={1}
             style={{ marginBottom: 20 }}
             data={data}
+            extraData={score}
             renderItem={({ item, index }) => {
               return (
                 <TouchableOpacity
@@ -119,7 +146,19 @@ export default function Home({ navigation }) {
                         { fontSize: 13, color: "#484848" },
                       ]}
                     >
-                      Pre-test: -
+                      Pre-test:{"  "}
+                      {score.filter((items) => {
+                        return (
+                          items.lesson_id == item.id && items.Type == "PRETEST"
+                        );
+                      })[0]?.score == undefined
+                        ? "-"
+                        : score.filter((items) => {
+                            return (
+                              items.lesson_id == item.id &&
+                              items.Type == "PRETEST"
+                            );
+                          })[0]?.score + " %"}
                     </Text>
                     <Text
                       style={[
@@ -127,7 +166,19 @@ export default function Home({ navigation }) {
                         { fontSize: 13, color: "#484848" },
                       ]}
                     >
-                      Post-test: -
+                      Post-test:{" "}
+                      {score.filter((items) => {
+                        return (
+                          items.lesson_id == item.id && items.Type == "POSTTEST"
+                        );
+                      })[0]?.score == undefined
+                        ? "-"
+                        : score.filter((items) => {
+                            return (
+                              items.lesson_id == item.id &&
+                              items.Type == "POSTTEST"
+                            );
+                          })[0]?.score + " %"}
                     </Text>
                   </View>
 

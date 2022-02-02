@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -19,6 +20,7 @@ import {
 import { useRecoilState } from "recoil";
 import { tokenState } from "../../recoil/recoil";
 import { apiservice } from "../../service/api";
+import { authActionScore } from "../../action/authAction";
 const { width, height } = Dimensions.get("screen");
 export default function Test({ navigation, route }) {
   const [token, setToken] = useRecoilState(tokenState);
@@ -26,41 +28,46 @@ export default function Test({ navigation, route }) {
   const [quiz, setQuiz] = useState([]);
   const [choice, setchoice] = useState("");
   const [ans, setAns] = useState([]);
+  console.log("eeeeee", ans.length);
+  console.log("8888", quiz.length);
   const [state, setState] = useState({
     Type: "POSTTEST",
-    lesson_id: route.params,
+    lesson_id: route.params.id,
     score: "",
   });
+  console.log("statestate", state);
   const [status, setStatus] = useState(false);
   useEffect(() => {
     getTest();
   }, []);
   async function send() {
-    setStatus(true);
-    setState({
+    let data = {
       ...state,
       score: (
         (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
         100
       ).toFixed(),
-    });
-    if (state.score != "") {
+    };
+    if (ans.length == quiz.length) {
       const send = await authActionScore({
-        state,
+        state: data,
         token: token.accessToken,
       });
       if (send) {
-        console.log("GG");
+        setStatus(true);
       }
+    } else {
+      Alert.alert("Please answer all of the following questions.");
     }
   }
   const getTest = async () => {
     const res = await apiservice({
-      path: "/lesson/gettest/" + route.params,
+      path: "/lesson/gettest/" + route.params.id,
       method: "get",
     });
 
     if (res.status == 200) {
+      console.log(res.data.data);
       setQuiz(res.data.data);
     } else {
       console.log("error");
@@ -82,7 +89,7 @@ export default function Test({ navigation, route }) {
           <Text
             style={[styles.textTitle, { width: "100%", textAlign: "left" }]}
           >
-            LIGHT ROAST
+            {route.params.title}
           </Text>
           {status && (
             <Text

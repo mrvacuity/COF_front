@@ -18,6 +18,8 @@ import {
 const { width, height } = Dimensions.get("screen");
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as Google from "expo-google-app-auth";
+import * as Facebook from "expo-facebook";
 import CalendarPicker from "react-native-calendar-picker";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
@@ -123,7 +125,44 @@ export default function Login({ navigation }) {
     birth_date: "",
   });
   const [token, setState] = useRecoilState(tokenState);
+  async function logInFacebook() {
+    try {
+      await Facebook.initializeAsync({
+        appId: "<APP_ID>",
+      });
+      const { type, token, expirationDate, permissions, declinedPermissions } =
+        await Facebook.logInWithReadPermissionsAsync({
+          permissions: ["public_profile"],
+        });
+      if (type === "success") {
+        // Get the user's name using Facebook's Graph API
+        const response = await fetch(
+          `https://graph.facebook.com/me?access_token=${token}`
+        );
+        Alert.alert("Logged in!", `Hi ${(await response.json()).name}!`);
+      } else {
+        // type === 'cancel'
+      }
+    } catch ({ message }) {
+      alert(`Facebook Login Error: ${message}`);
+    }
+  }
+  const signInAsync = async () => {
+    try {
+      const { type, user } = await Google.logInAsync({
+        iosClientId: `664664474549-oulrrhiifll6blfgrq6n766a06ik9jsu.apps.googleusercontent.com`,
+        androidClientId: `664664474549-oulrrhiifll6blfgrq6n766a06ik9jsu.apps.googleusercontent.com`,
+      });
 
+      if (type === "success") {
+        // Then you can use the Google REST API
+        console.log(" success, navigating to profile");
+        // navigation.navigate("Profile", { user });
+      }
+    } catch (error) {
+      console.log(" error with login", error);
+    }
+  };
   const [loginBody, setLoginBody] = useState({
     username: "",
     password: "",
@@ -189,7 +228,6 @@ export default function Login({ navigation }) {
       regisBody.birth_date != "" &&
       regisBody.email != "" &&
       regisBody.first_name != "" &&
-      regisBody.image_profile != "" &&
       regisBody.last_name != "" &&
       regisBody.password != "" &&
       regisBody.username != ""
@@ -204,7 +242,7 @@ export default function Login({ navigation }) {
         Alert.alert("Register success!");
         setPage(1);
       } else {
-        Alert.alert(res.data.message);
+        Alert.alert("the email or username has already been taken.");
       }
     } else {
       Alert.alert("Please fill out the information correctly and completely.");
@@ -213,13 +251,14 @@ export default function Login({ navigation }) {
   function LoginSocial() {
     return (
       <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity style={styles.buttonSocial}>
+        <TouchableOpacity onPress={signInAsync} style={styles.buttonSocial}>
           <Image
             style={{ width: 20, height: 15 }}
             source={require("../../img/mail.png")}
           />
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={logInFacebook}
           style={[styles.buttonSocial, { marginHorizontal: 7 }]}
         >
           <Image

@@ -49,6 +49,8 @@ function main() {
     <Stack.Navigator headerMode="none" mode="modal" initialRouteName="Login">
       {token == "" ? (
         <Stack.Screen name="Login" component={Login} />
+      ) : token.role == "ADMIN" ? (
+        <Stack.Screen name="Menu" component={Menu} />
       ) : (
         <Stack.Screen name="MyTabs" component={MyTabs} />
       )}
@@ -65,7 +67,6 @@ function main() {
       <Stack.Screen name="Favorite" component={Favorite} />
       <Stack.Screen name="Post" component={Post} />
 
-      <Stack.Screen name="Menu" component={Menu} />
       <Stack.Screen name="EditLesson" component={EditLesson} />
       <Stack.Screen name="EditArticle" component={EditArticle} />
       <Stack.Screen name="LessonList" component={LessonList} />

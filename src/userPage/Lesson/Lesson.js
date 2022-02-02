@@ -24,8 +24,9 @@ export default function Lesson({ navigation, route }) {
   const [testMedium, setTestMedium] = useState(false);
   const [testDark, setTestDark] = useState(false);
   const data = route.params.lesson;
+  const data1 = route.params;
   const [tab, setTab] = useState(0);
-  console.log(route.params);
+  console.log("datav", data);
   if (data == null) {
     return null;
   }
@@ -57,7 +58,7 @@ export default function Lesson({ navigation, route }) {
             >
               <Entypo name="chevron-thin-left" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.textTitle}>Roasting</Text>
+            <Text style={styles.textTitle}>{data1.title}</Text>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("TestHistory");
@@ -160,7 +161,7 @@ export default function Lesson({ navigation, route }) {
               {testMedium ? (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("Test", route.params.id);
+                    navigation.navigate("Test", route.params);
                   }}
                   style={[styles.buttonTest, { width: 105 }]}
                 >
@@ -179,7 +180,11 @@ export default function Lesson({ navigation, route }) {
             </View>
             <Image
               style={styles.viewImgCoffee}
-              source={{ uri: data[tab].image_url }}
+              source={{
+                uri:
+                  "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                  data[tab].image_url,
+              }}
             />
             <Text style={styles.textLight}>{data[tab].description}</Text>
             <TouchableOpacity

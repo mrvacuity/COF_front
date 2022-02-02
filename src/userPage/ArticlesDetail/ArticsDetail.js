@@ -12,6 +12,7 @@ import {
   ScrollView,
   Modal,
   Alert,
+  Share,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -28,17 +29,50 @@ import moment from "moment";
 import { authActionComment } from "../../action/authAction";
 import { useRecoilState } from "recoil";
 import { tokenState } from "../../recoil/recoil";
+import { apiservice } from "../../service/api";
+import { useIsFocused } from "@react-navigation/native";
 const { width, height } = Dimensions.get("screen");
 export default function ArticsDetail({ navigation, route }) {
-  const data = route.params;
+  // const data = route.params;
+  const [data, setdata] = useState(route.params);
+
+  console.log("route.paramsroute.params", route.params);
   const [token, setToken] = useRecoilState(tokenState);
+  const [like, setLike] = useState(false);
+  const focus = useIsFocused();
   const [state, setState] = useState({
     comment: "",
     feed_id: data.id,
     uid: data.uid,
   });
-  console.log("routeeeeeeeeeee", route.params);
-  console.log(state);
+
+  const getFeed = async () => {
+    const res = await apiservice({
+      path: "/lesson/getallfeed",
+      method: "get",
+      token: token.accessToken,
+    });
+
+    let a = res.data.filter((item) => {
+      return item.id == data.id;
+    });
+
+    setdata(a[0]);
+    // if (res.status == 200) {
+    //   setData(res.data);
+    // }
+  };
+  const getLike = async () => {
+    const res = await apiservice({
+      path: "/lesson/alllike",
+      token: token.accessToken,
+    });
+    if (res.status == 200) {
+      // if (res.data.data == 1) {
+      //   setLike(true);
+      // }
+    }
+  };
   async function comment() {
     if (state.comment != "") {
       const comment = await authActionComment({
@@ -46,16 +80,21 @@ export default function ArticsDetail({ navigation, route }) {
         token: token.accessToken,
       });
       if (comment) {
+        getFeed();
         setState({ comment: "" });
-      }
-      if (!comment) {
-        Alert.alert("Error");
       }
     }
   }
   if (data == null) {
     return null;
   }
+  useEffect(() => {
+    if (focus) {
+      getFeed();
+      getLike();
+    }
+  }, [focus]);
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -80,15 +119,42 @@ export default function ArticsDetail({ navigation, route }) {
             </TouchableOpacity>
             <Text style={styles.textTitle}>Articles</Text>
             <View style={styles.viewHeader1}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  Share.share({
+                    message: "",
+                  });
+                }}
+              >
                 <Ionicons
                   name="share-social-outline"
                   size={24}
                   color="#484848"
                 />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => {}} style={{ marginLeft: 8 }}>
-                <AntDesign name="hearto" size={24} color="#484848" />
+              <TouchableOpacity
+                onPress={async () => {
+                  const res = await apiservice({
+                    path: "/lesson/like?feed_id=" + data.id,
+                    token: token.accessToken,
+                  });
+
+                  if (res.status == 200) {
+                    console.log(res.data.data);
+                    if (res.data.data != 1) {
+                      setLike(true);
+                    } else {
+                      setLike(false);
+                    }
+                  }
+                }}
+                style={{ marginLeft: 8 }}
+              >
+                <AntDesign
+                  name={like ? "heart" : "hearto"}
+                  size={24}
+                  color="#484848"
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -119,11 +185,11 @@ export default function ArticsDetail({ navigation, route }) {
               source={{
                 uri:
                   "https://api-cof.wishesexistence.co/api/image/getimage/" +
-                  data.image_url,
+                  data?.image_url,
               }}
             />
             <Text style={[styles.textLight, { marginVertical: 25 }]}>
-              {data.description}
+              {data?.description}
             </Text>
             <Text style={styles.textComment}>Comment</Text>
             <View style={styles.viewInputComment}>
@@ -147,7 +213,9 @@ export default function ArticsDetail({ navigation, route }) {
             <FlatList
               numColumns={1}
               style={{ marginBottom: 20 }}
-              data={data.comment_model}
+              data={data.comment_model.sort((a, b) => {
+                return b.id - a.id;
+              })}
               renderItem={({ item, index }) => {
                 return (
                   <View style={styles.viewComment}>

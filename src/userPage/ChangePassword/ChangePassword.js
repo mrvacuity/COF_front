@@ -21,6 +21,7 @@ import {
   Feather,
   FontAwesome5,
 } from "@expo/vector-icons";
+import { apiservice } from "../../service/api";
 import { authActionResetPassword } from "../../action/authAction";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { tokenState } from "../../recoil/recoil";
@@ -30,26 +31,48 @@ export default function ChangePassword({ navigation }) {
   const [token, setToken] = useRecoilState(tokenState);
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
+  const [user, setUser] = useState();
   const [state, setstate] = useState({
     password: "",
     newpassword: "",
   });
+  useEffect(() => {
+    getProfile(token);
+  }, [token]);
+
   const [check, setCheck] = useState("");
+  const getProfile = async () => {
+    const res = await apiservice({
+      path: "/authen/user",
+      method: "get",
+      token: token.accessToken,
+    });
+
+    if (res.status == 200) {
+      setUser(res.data.result.id);
+      console.log(res.data.result.id);
+    } else {
+    }
+  };
   async function resetPassword() {
     if (state.password != "" && state.newpassword != "") {
       if (state.newpassword == check) {
         const reset = await authActionResetPassword({
           state,
           token: token.accessToken,
+          user,
         });
+        console.log(user);
         if (reset) {
           setTimeout(() => {
             setModalVisible1(true);
-          }, 2000);
+          }, 500);
           setTimeout(() => {
             setModalVisible1(false);
-          }, 3000);
+            navigation.goBack("");
+          }, 3500);
         } else {
+          console.log(reset);
           setModalVisible2(true);
         }
       } else {

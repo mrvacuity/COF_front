@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -18,10 +18,55 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { tokenState } from "../../recoil/recoil";
+import { apiservice } from "../../service/api";
+import { useIsFocused } from "@react-navigation/native";
+import { useRecoilState, useRecoilValue } from "recoil";
+import moment from "moment";
 const { width, height } = Dimensions.get("screen");
 export default function TestHistory({ navigation }) {
   const [Dropdown, setDropdown] = useState(false);
+  const [token, setToken] = useRecoilState(tokenState);
   const [lesson, setlesson] = useState("Roasting");
+  const [lessonScore, setlessonScore] = useState(1);
+  const [score, setScore] = useState([]);
+  const [data, setData] = useState([]);
+
+  const isfocused = useIsFocused();
+
+  const getLesson = async () => {
+    const res = await apiservice({
+      path: "/lesson/getalllesson",
+      method: "get",
+    });
+
+    if (res.status == 200) {
+      setData(res.data);
+    } else {
+    }
+  };
+
+  useEffect(() => {
+    if (isfocused) {
+      getScore(token);
+      getLesson();
+    }
+  }, [isfocused]);
+
+  const getScore = async () => {
+    const res = await apiservice({
+      path: "/lesson/score",
+      method: "get",
+      token: token.accessToken,
+    });
+
+    if (res.status == 200) {
+      setScore(res.data);
+    }
+  };
+
+  console.log(score);
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -44,7 +89,7 @@ export default function TestHistory({ navigation }) {
             <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
               Lesson:
             </Text>
-            <View>
+            <View style={{ zIndex: 999 }}>
               <TouchableOpacity
                 onPress={() => {
                   setDropdown((val) => !val);
@@ -60,54 +105,64 @@ export default function TestHistory({ navigation }) {
                   color="#484848"
                 />
               </TouchableOpacity>
-              {Dropdown && (
-                <View style={styles.listDropdown}>
-                  <FlatList
-                    numColumns={1}
-                    data={[
-                      { name: "Roasting" },
-                      { name: "Plant" },
-                      { name: "Brew" },
-                      { name: "Harvest" },
-                    ]}
-                    renderItem={({ item, index }) => {
-                      return (
-                        <TouchableOpacity
-                          onPress={() => {
-                            setlesson(item.name);
-                            setDropdown(false);
-                          }}
-                          style={[
-                            styles.selectDropdown,
-                            {
-                              borderTopWidth: index == 0 ? 0.6 : 0,
-                            },
-                          ]}
-                        >
-                          <Text
-                            style={[styles.textLight, { color: "#000000" }]}
-                          >
-                            {item.name}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    }}
-                  />
-                </View>
-              )}
             </View>
           </View>
-          <Text style={styles.text18}>Pre-test: 4/10</Text>
+          {Dropdown && (
+            <View style={styles.listDropdown}>
+              <FlatList
+                numColumns={1}
+                data={data}
+                renderItem={({ item, index }) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setlesson(item.title);
+                        setlessonScore(item.id);
+                        setDropdown(false);
+                      }}
+                      style={[
+                        styles.selectDropdown,
+                        {
+                          borderTopWidth: index == 0 ? 0.6 : 0,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.textLight, { color: "#000000" }]}>
+                        {item.title}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
+          )}
+          <Text style={styles.text18}>
+            Pre-test:{" "}
+            {score.filter((items) => {
+              return items.lesson_id == lessonScore && items.Type == "PRETEST";
+            })[0]?.score == undefined
+              ? ""
+              : score.filter((item) => {
+                  return (
+                    item.lesson_id == lessonScore && item.Type == "PRETEST"
+                  );
+                })[0]?.score + " %"}
+          </Text>
           <Text style={[styles.text18, { marginTop: 17 }]}>Post-test:</Text>
           <FlatList
             numColumns={1}
             style={{ marginTop: 10 }}
-            data={[{ n: 1 }]}
+            data={score
+              .filter((item) => {
+                return item.lesson_id == lessonScore && item.Type == "POSTTEST";
+              })
+              .sort((a, b) => b.score - a.score)}
             renderItem={({ item, index }) => {
               return (
                 <View style={styles.listPosttest}>
                   <Text style={[styles.textLight, { color: "#000000" }]}>
-                    10/10 (high score)
+                    {item?.score}
+                    {" %"} {index == 0 && "(high score)"}
                   </Text>
                   <Text
                     style={[
@@ -115,7 +170,10 @@ export default function TestHistory({ navigation }) {
                       { color: "#000000", fontSize: 12 },
                     ]}
                   >
-                    {"Date: 10/12/2021\t\tTime: 14:01:45"}
+                    {"Date: " +
+                      moment(item?.createdAt).format("DD/MM/YYYY") +
+                      "\t\tTime: " +
+                      moment(item?.createdAt).format("HH:mm")}
                   </Text>
                 </View>
               );
@@ -190,6 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    zIndex: 999,
   },
   buttonDropdown: {
     backgroundColor: "rgba(196, 196, 196, 0.14)",
@@ -201,11 +260,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   listDropdown: {
-    width: "100%",
-    backgroundColor: "#F4F3F3",
+    width: "78%",
+    backgroundColor: "#FFF",
+    alignSelf: "flex-end",
     position: "absolute",
-    zIndex: 5,
-    marginTop: 37,
+    zIndex: 99,
+    marginTop: height * 0.1,
+    paddingRight: 20,
   },
   selectDropdown: {
     width: "100%",
@@ -214,6 +275,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     justifyContent: "center",
     borderWidth: 0.6,
+    zIndex: 999,
   },
   listPosttest: {
     width: "100%",

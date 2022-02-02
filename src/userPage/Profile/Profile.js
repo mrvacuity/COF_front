@@ -131,207 +131,215 @@ export default function Profile({ navigation }) {
     <View style={styles.container}>
       <SafeAreaView />
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
-
-      <View style={[styles.viewDetail]}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 29,
-          }}
-        >
-          <Text style={{ width: "10%" }}></Text>
-          <Text style={styles.textTitle}>PROFILE</Text>
-          {changeProfile ? (
-            <Text style={{ width: "10%" }}></Text>
-          ) : (
-            <TouchableOpacity
-              style={{ width: "10%", alignItems: "flex-end" }}
-              onPress={() => {
-                setToken("");
-                navigation.navigate("Login");
-              }}
-            >
-              <Feather name="log-out" size={24} color="#484848" />
-            </TouchableOpacity>
-          )}
-        </View>
-        <View style={{ alignSelf: "center", marginVertical: 32 }}>
-          <TouchableOpacity
-            disabled={changeProfile ? false : true}
-            onPress={pickImage}
-          >
-            <Image
-              style={{
-                width: 150,
-                height: 150,
-                borderRadius: 80,
-                backgroundColor: "#cccc",
-              }}
-              source={{
-                uri:
-                  "https://api-cof.wishesexistence.co/api/image/getimage/" +
-                  state.image_profile,
-              }}
-            />
-          </TouchableOpacity>
-          {changeProfile ? (
-            <Text style={styles.textSubject}>Change Profile Picture</Text>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setChangeProfile(true);
-              }}
-              style={{ alignSelf: "flex-end", marginTop: -10 }}
-            >
-              <FontAwesome5 name="edit" size={14} color="#484848" />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <View style={styles.viewProfile}>
-          <Text style={styles.textSubject}>Name</Text>
-          <View style={{ flexDirection: "row" }}>
-            <TextInput
-              editable={changeProfile ? true : false}
-              onChangeText={(text) => {
-                setState((val) => ({ ...val, first_name: text }));
-              }}
-              defaultValue={userData.first_name}
-              style={[styles.textDetail, { width: width * 0.25 }]}
-            />
-            <TextInput
-              editable={changeProfile ? true : false}
-              onChangeText={(text) => {
-                setState((val) => ({ ...val, last_name: text }));
-              }}
-              defaultValue={userData.last_name}
-              style={[styles.textDetail, { width: width * 0.25 }]}
-            />
-          </View>
-        </View>
-        <View style={styles.viewProfile}>
-          <Text style={styles.textSubject}>Username</Text>
-          <TextInput
-            onChangeText={(text) => {
-              setState((val) => ({ ...val, username: text }));
-            }}
-            editable={changeProfile ? true : false}
-            defaultValue={userData.username}
-            style={styles.textDetail}
-          />
-        </View>
-        <View style={styles.viewProfile}>
-          <Text style={styles.textSubject}>Email</Text>
-          <TextInput
-            editable={changeProfile ? true : false}
-            defaultValue={userData.email}
-            style={styles.textDetail}
-          />
-        </View>
-        <View style={styles.viewProfile}>
-          <Text style={styles.textSubject}>Bio</Text>
-          <TextInput
-            maxLength={400}
-            defaultValue={state.about_me}
-            onChangeText={(text) => {
-              setState((val) => ({ ...val, about_me: text }));
-
-              setTextLength(text.length);
-            }}
-            editable={changeProfile ? true : false}
-            multiline
-            style={[styles.textDetail, { paddingRight: 50 }]}
-          />
-          <Text
-            style={[
-              {
-                position: "absolute",
-                fontFamily: "RobotoLight",
-                fontSize: 12,
-                color: "#484848",
-                alignSelf: "flex-end",
-                right: 0,
-                paddingRight: 20,
-              },
-            ]}
-          >
-            {textLength + "/400"}
-          </Text>
-        </View>
-        <View style={styles.viewProfile}>
-          <Text style={styles.textSubject}>DOB</Text>
-          <Text style={styles.textDetail}>
-            {moment(state.birth_date).format("DD MMMM YYYY")}
-          </Text>
-          <TouchableOpacity
-            disabled={changeProfile ? false : true}
-            onPress={() => {
-              setModalVisible(true);
-            }}
-            style={styles.calendar}
-          >
-            <Feather name="calendar" size={14} color="#484848" />
-          </TouchableOpacity>
-        </View>
-        {changeProfile ? (
-          <TouchableOpacity
-            onPress={editProfile}
-            style={[styles.button, { marginVertical: 31 }]}
-          >
-            <Text style={styles.textButton}>Save</Text>
-          </TouchableOpacity>
-        ) : (
-          <View>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("ChangePassword");
-              }}
-              style={[styles.button, { marginTop: 31 }]}
-            >
-              <Text style={styles.textButton}>Change Password</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("ReportProblem");
-              }}
-              style={[styles.button, { marginVertical: 12 }]}
-            >
-              <Text style={styles.textButton}>Report Problem</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-          setModalVisible(!modalVisible);
+      <ScrollView
+        style={{
+          minHeight: "100%",
+          backgroundColor: "#f0e9e4",
+          borderTopLeftRadius: 30,
+          borderTopRightRadius: 30,
         }}
       >
-        <View style={styles.bgModal}>
-          <View style={[styles.viewDetailModal]}>
-            <CalendarPicker
-              weekdays={week}
-              months={months}
-              initialDate={day}
-              nextTitle={<AntDesign name="right" size={24} />}
-              previousTitle={<AntDesign name="left" size={24} />}
-              maxDate={moment(new Date()).format("LLLL")}
-              selectedDayColor="#F8831C"
-              selectedDayTextColor="#FFFFFF"
-              onDateChange={(day) => {
-                // setday(day);
-                setShowDate(day);
-                setState({ ...state, birth_date: day });
-                setModalVisible(!modalVisible);
+        <View style={[styles.viewDetail]}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 29,
+            }}
+          >
+            <Text style={{ width: "10%" }}></Text>
+            <Text style={styles.textTitle}>PROFILE</Text>
+            {changeProfile ? (
+              <Text style={{ width: "10%" }}></Text>
+            ) : (
+              <TouchableOpacity
+                style={{ width: "10%", alignItems: "flex-end" }}
+                onPress={() => {
+                  setToken("");
+                  navigation.navigate("Login");
+                }}
+              >
+                <Feather name="log-out" size={24} color="#484848" />
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={{ alignSelf: "center", marginVertical: 32 }}>
+            <TouchableOpacity
+              disabled={changeProfile ? false : true}
+              onPress={pickImage}
+            >
+              <Image
+                style={{
+                  width: 150,
+                  height: 150,
+                  borderRadius: 80,
+                  backgroundColor: "#cccc",
+                }}
+                source={{
+                  uri:
+                    "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                    state.image_profile,
+                }}
+              />
+            </TouchableOpacity>
+            {changeProfile ? (
+              <Text style={styles.textSubject}>Change Profile Picture</Text>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setChangeProfile(true);
+                }}
+                style={{ alignSelf: "flex-end", marginTop: -10 }}
+              >
+                <FontAwesome5 name="edit" size={14} color="#484848" />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.viewProfile}>
+            <Text style={styles.textSubject}>Name</Text>
+            <View style={{ flexDirection: "row" }}>
+              <TextInput
+                editable={changeProfile ? true : false}
+                onChangeText={(text) => {
+                  setState((val) => ({ ...val, first_name: text }));
+                }}
+                defaultValue={userData.first_name}
+                style={[styles.textDetail, { width: width * 0.25 }]}
+              />
+              <TextInput
+                editable={changeProfile ? true : false}
+                onChangeText={(text) => {
+                  setState((val) => ({ ...val, last_name: text }));
+                }}
+                defaultValue={userData.last_name}
+                style={[styles.textDetail, { width: width * 0.25 }]}
+              />
+            </View>
+          </View>
+          <View style={styles.viewProfile}>
+            <Text style={styles.textSubject}>Username</Text>
+            <TextInput
+              onChangeText={(text) => {
+                setState((val) => ({ ...val, username: text }));
               }}
+              editable={changeProfile ? true : false}
+              defaultValue={userData.username}
+              style={styles.textDetail}
             />
           </View>
+          <View style={styles.viewProfile}>
+            <Text style={styles.textSubject}>Email</Text>
+            <TextInput
+              editable={changeProfile ? true : false}
+              defaultValue={userData.email}
+              style={styles.textDetail}
+            />
+          </View>
+          <View style={styles.viewProfile}>
+            <Text style={styles.textSubject}>Bio</Text>
+            <TextInput
+              maxLength={400}
+              defaultValue={state.about_me}
+              onChangeText={(text) => {
+                setState((val) => ({ ...val, about_me: text }));
+
+                setTextLength(text.length);
+              }}
+              editable={changeProfile ? true : false}
+              multiline
+              style={[styles.textDetail, { paddingRight: 50 }]}
+            />
+            <Text
+              style={[
+                {
+                  position: "absolute",
+                  fontFamily: "RobotoLight",
+                  fontSize: 12,
+                  color: "#484848",
+                  alignSelf: "flex-end",
+                  right: 0,
+                  paddingRight: 20,
+                },
+              ]}
+            >
+              {textLength + "/400"}
+            </Text>
+          </View>
+          <View style={styles.viewProfile}>
+            <Text style={styles.textSubject}>DOB</Text>
+            <Text style={styles.textDetail}>
+              {moment(state.birth_date).format("DD MMMM YYYY")}
+            </Text>
+            <TouchableOpacity
+              disabled={changeProfile ? false : true}
+              onPress={() => {
+                setModalVisible(true);
+              }}
+              style={styles.calendar}
+            >
+              <Feather name="calendar" size={14} color="#484848" />
+            </TouchableOpacity>
+          </View>
+          {changeProfile ? (
+            <TouchableOpacity
+              onPress={editProfile}
+              style={[styles.button, { marginVertical: 31 }]}
+            >
+              <Text style={styles.textButton}>Save</Text>
+            </TouchableOpacity>
+          ) : (
+            <View>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("ChangePassword");
+                }}
+                style={[styles.button, { marginTop: 31 }]}
+              >
+                <Text style={styles.textButton}>Change Password</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("ReportProblem");
+                }}
+                style={[styles.button, { marginVertical: 12 }]}
+              >
+                <Text style={styles.textButton}>Report Problem</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-      </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <View style={styles.bgModal}>
+            <View style={[styles.viewDetailModal]}>
+              <CalendarPicker
+                weekdays={week}
+                months={months}
+                initialDate={day}
+                nextTitle={<AntDesign name="right" size={24} />}
+                previousTitle={<AntDesign name="left" size={24} />}
+                maxDate={moment(new Date()).format("LLLL")}
+                selectedDayColor="#F8831C"
+                selectedDayTextColor="#FFFFFF"
+                onDateChange={(day) => {
+                  // setday(day);
+                  setShowDate(day);
+                  setState({ ...state, birth_date: day });
+                  setModalVisible(!modalVisible);
+                }}
+              />
+            </View>
+          </View>
+        </Modal>
+      </ScrollView>
     </View>
   );
 }

@@ -6,24 +6,23 @@ import {
   Image,
   Dimensions,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
-  FlatList,
-  ScrollView,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import moment from "moment";
 import {
   MaterialCommunityIcons,
-  Entypo,
-  FontAwesome,
-  MaterialIcons,
   Feather,
-  FontAwesome5,
   SimpleLineIcons,
 } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("screen");
 import { Camera } from "expo-camera";
+import axios from "axios";
+import { apiservice } from "../../service/api";
+import { useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import moment from "moment";
 
 export default function Camara({ navigation }) {
   const cameraRef = useRef();
@@ -33,7 +32,14 @@ export default function Camara({ navigation }) {
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [result, setResult] = useState(false);
   const [submit, setSubmit] = useState(false);
+  const [results, serResults] = useState(0);
+  const [DefaultsImage, setDefaultsImage] = useState("");
+  const token = useRecoilValue(tokenState);
+
+  console.log(DefaultsImage);
+
   const [page, setPage] = useState(1);
+
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
@@ -41,13 +47,46 @@ export default function Camara({ navigation }) {
     })();
   }, []);
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-
       quality: 0.4,
       base64: true,
     });
+    setResult(true);
+
+    let localUri = result.uri;
+    let filename = localUri.split("/").pop();
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+    let formData = new FormData();
+    formData.append("file", { uri: localUri, name: filename, type });
+
+    const base64upload = await apiservice({
+      path: "/image/create",
+      method: "post",
+      body: {
+        name: result.uri.split("/").reverse()[0],
+        base64: "data:image/png;base64," + result.base64,
+      },
+    });
+
+    setDefaultsImage(base64upload.data.imageRefId);
+
+    const res = await axios.post(
+      "https://getprediction-eb7wj7y6sa-as.a.run.app",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    if (res.status == 200) {
+      serResults(res.data["Prediction (pH)"]);
+      setPage(2);
+      setResult(false);
+    } else {
+      setResult(false);
+    }
 
     // const res = await apiservice({
     //   path: "/image/create",
@@ -66,29 +105,58 @@ export default function Camara({ navigation }) {
     // } else {
     // }
   };
+
   const onCameraReady = () => {
     setIsCameraReady(true);
   };
   const onSnap = async () => {
     // if (cameraRef.current) {
     const options = { quality: 0.7, base64: true };
-    const data = await cameraRef.current.takePictureAsync(options);
-    const source = data.base64;
+    const result = await cameraRef.current.takePictureAsync(options);
+    setResult(true);
 
-    if (source) {
-      await cameraRef.current.pausePreview();
-      setIsPreview(true);
+    console.log(result.uri);
+    // const source = data.base64;
+
+    let localUri = result.uri;
+    let filename = localUri.split("/").pop();
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+    let formData = new FormData();
+    formData.append("file", { uri: localUri, name: filename, type });
+
+    const base64upload = await apiservice({
+      path: "/image/create",
+      method: "post",
+      body: {
+        name: result.uri.split("/").reverse()[0],
+        base64: "data:image/png;base64," + result.base64,
+      },
+    });
+
+    setDefaultsImage(base64upload.data.imageRefId);
+
+    const res = await axios.post(
+      "https://getprediction-eb7wj7y6sa-as.a.run.app",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    if (res.status == 200) {
+      serResults(res.data["Prediction (pH)"]);
       setPage(2);
-
-      // let base64Img = `data:image/jpg;base64,${source}`;
-      // let apiUrl =
-      //   "https://api.cloudinary.com/v1_1/<your-cloud-name>/image/upload";
-      // let data = {
-      //   file: base64Img,
-      //   upload_preset: "<your-upload-preset>",
-      // };
-      // }
+      setResult(false);
+    } else {
+      setResult(false);
     }
+
+    // if (source) {
+    //   await cameraRef.current.pausePreview();
+    //   setIsPreview(true);
+    //   setPage(2);
+    // }
   };
 
   if (hasPermission === null) {
@@ -100,6 +168,18 @@ export default function Camara({ navigation }) {
   return (
     <View style={styles.container}>
       <SafeAreaView />
+      <Modal transparent={true} visible={result}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#00000080",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size={"large"} />
+        </View>
+      </Modal>
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
 
       <View style={[styles.viewDetail]}>
@@ -135,12 +215,27 @@ export default function Camara({ navigation }) {
             />
           </TouchableOpacity>
         </View>
-        <Camera
-          style={styles.camera}
-          type={type}
-          onCameraReady={onCameraReady}
-          ref={cameraRef}
-        ></Camera>
+        {page == 1 && (
+          <Camera
+            style={styles.camera}
+            type={type}
+            onCameraReady={onCameraReady}
+            ref={cameraRef}
+          ></Camera>
+        )}
+        {page == 2 && (
+          <Image
+            style={[
+              styles.camera,
+              { width: width * 0.9, backgroundColor: "#000" },
+            ]}
+            source={{
+              uri:
+                "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                DefaultsImage.replace(".png", ""),
+            }}
+          />
+        )}
         {page == 1 ? (
           <View style={styles.viewCapture}>
             <Text style={{ width: "15%" }}></Text>
@@ -162,8 +257,22 @@ export default function Camara({ navigation }) {
         ) : page == 2 ? (
           <View style={{ alignSelf: "center", marginTop: 25 }}>
             <TouchableOpacity
-              onPress={() => {
-                setPage(3);
+              onPress={async () => {
+                const res = await apiservice({
+                  path: "/lesson/createhistory",
+                  method: "post",
+                  body: {
+                    Sour: results,
+                    Sweet: 0,
+                    image_url: DefaultsImage,
+                    total: 0,
+                  },
+                  token: token.accessToken,
+                });
+
+                if (res.status == 200) {
+                  setPage(3);
+                }
               }}
               style={styles.button}
             >
@@ -184,23 +293,26 @@ export default function Camara({ navigation }) {
               <View style={styles.viewTopic}>
                 <Text style={styles.textSuject}>Result</Text>
                 <Text style={styles.textDate}>
-                  Date : 24/11/2021 Time : 21:21
+                  Date : {moment().format("DD/MM/YYYYY")} Time :{" "}
+                  {moment().format("HH:mm")}
                 </Text>
               </View>
               <View style={styles.viewTopic}>
                 <Text style={styles.textSujectLight}>Sour</Text>
-                <Text style={styles.textSujectLight}>pH6.3</Text>
+                <Text style={styles.textSujectLight}>
+                  pH{results.toFixed(2)}
+                </Text>
               </View>
-              <View style={styles.viewTopic}>
+              {/* <View style={styles.viewTopic}>
                 <Text style={styles.textSujectLight}>Sweetness</Text>
                 <Text style={styles.textSujectLight}>20 brix</Text>
-              </View>
-              <View style={styles.viewTopic}>
+              </View> */}
+              {/* <View style={styles.viewTopic}>
                 <Text style={styles.textSujectLight}>
                   Total dissolved solids (TDS)
                 </Text>
                 <Text style={styles.textSujectLight}>40 ppm</Text>
-              </View>
+              </View> */}
             </View>
           )
         )}
