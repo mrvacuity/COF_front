@@ -22,63 +22,217 @@ import {
   Ionicons,
   EvilIcons,
 } from "@expo/vector-icons";
+import { KeyboardAvoidingScrollView } from "react-native-keyboard-avoiding-scroll-view";
 const { width, height } = Dimensions.get("screen");
-export default function NewLesson({ navigation }) {
+import { useRecoilState, useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import { apiservice } from "../../service/api";
+import * as ImagePicker from "expo-image-picker";
+import {
+  authActionCreateComponent,
+  authActionEditComponent,
+} from "../../action/authAction";
+export default function NewLesson({ navigation, route }) {
+  const [token, setToken] = useRecoilState(tokenState);
+  console.log("ttttttttttt", route.params);
+  const [image, setImage] = useState();
+  const [state, setState] = useState({
+    video_url: route.params.lesson == undefined ? route.params.video_url : "",
+    video_name: route.params.lesson == undefined ? route.params.video_name : "",
+    description:
+      route.params.lesson == undefined ? route.params.description : "",
+    image_url: {
+      img: route.params.lesson == undefined ? route.params.image_url.img : "",
+      width: "",
+      height:
+        route.params.lesson == undefined ? route.params.image_url.height : "",
+    },
+    title: route.params.lesson == undefined ? route.params.title : "",
+    lesson_id:
+      route.params.lesson != undefined
+        ? route.params.id
+        : route.params.lesson_id,
+  });
+  console.log("statestate", state);
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+
+      quality: 0.4,
+      base64: true,
+    });
+
+    const res = await apiservice({
+      path: "/image/create",
+      method: "post",
+      body: {
+        name: result.uri.split("/").reverse()[0],
+        base64: "data:image/png;base64," + result.base64,
+      },
+    });
+
+    if (res.status == 200) {
+      setImage(result.uri);
+      setState({
+        ...state,
+        image_url: {
+          ...state.image_url,
+          img: res.data.imageRefId.replace(".png", ""),
+          width: result.width,
+          height: result.height,
+        },
+      });
+    } else {
+    }
+  };
+  async function Create() {
+    if (state.title != "" && state.description != "") {
+      const create = await authActionCreateComponent({
+        state,
+        token: token.accessToken,
+      });
+      const res = await apiservice({
+        path: "/lesson/getalllesson",
+        method: "get",
+      });
+
+      let a = res.data.filter((item) => {
+        return item.id == route.params;
+      });
+
+      if (create) {
+        navigation.goBack();
+      }
+    }
+  }
+  async function EditLesson() {
+    if (state.title != "" && state.description != "") {
+      const edit = await authActionEditComponent({
+        state,
+        token: token.accessToken,
+        id: route.params.id,
+      });
+      if (edit) {
+        navigation.goBack();
+      }
+    }
+  }
   return (
     <View style={styles.container}>
       <SafeAreaView />
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
       <ScrollView>
         <View style={[styles.viewDetail]}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                navigation.goBack("");
+          <KeyboardAvoidingScrollView>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
               }}
-              style={{ width: "10%" }}
             >
-              <Entypo name="chevron-thin-left" size={24} color="black" />
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack("");
+                }}
+                style={{ width: "10%" }}
+              >
+                <Entypo name="chevron-thin-left" size={24} color="black" />
+              </TouchableOpacity>
+              <Text style={styles.textTitle}>
+                {route.params.lesson == undefined
+                  ? route.params.title
+                  : "Name of new lesson"}
+              </Text>
+              <Text style={{ width: "10%" }}></Text>
+            </View>
+            <TextInput
+              value={state.title}
+              onChangeText={(text) => {
+                setState({ ...state, title: text });
+              }}
+              placeholder="Enter topic"
+              placeholderTextColor={"#484848"}
+              style={styles.inputTopic}
+            />
+            <TouchableOpacity onPress={pickImage} style={styles.buttonAdd}>
+              {state.image_url.img != "" ? (
+                <Image
+                  resizeMode="stretch"
+                  style={{
+                    width: "100%",
+                    minHeight: 165,
+                    height:
+                      state.image_url.height != "" &&
+                      state.image_url.height != undefined &&
+                      state.image_url.height / 1.5,
+                  }}
+                  source={{
+                    uri:
+                      "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                      state.image_url.img,
+                  }}
+                />
+              ) : (
+                <Text style={styles.text}>+ Add Photo</Text>
+              )}
             </TouchableOpacity>
-            <Text style={styles.textTitle}>Name of new lesson</Text>
-            <Text style={{ width: "10%" }}></Text>
-          </View>
-          <TextInput
-            placeholder="Enter topic"
-            placeholderTextColor={"#484848"}
-            style={styles.inputTopic}
-          />
-          <TouchableOpacity style={styles.buttonAdd}>
-            <Text style={styles.text}>+ Add Photo</Text>
-            {/* <Image style={{ width: "100%", height: 165 }} source={{ uri: "" }} /> */}
-          </TouchableOpacity>
-          <TextInput
-            multiline
-            placeholder="Enter lesson"
-            placeholderTextColor={"#484848"}
-            style={styles.inputArticle}
-          />
-          <Text
-            style={{
-              fontSize: 14,
-              fontFamily: "RobotoLight",
-              color: "#484848",
-              marginTop: 20,
-            }}
-          >
-            URL of video:
-          </Text>
-          <TextInput
-            placeholderTextColor={"#484848"}
-            style={styles.inputTopic}
-          />
-          <TouchableOpacity style={styles.buttonPost}>
-            <Text style={styles.text}>Save</Text>
-          </TouchableOpacity>
+            <TextInput
+              value={state.description}
+              onChangeText={(text) => {
+                setState({ ...state, description: text });
+              }}
+              multiline
+              placeholder="Enter lesson"
+              placeholderTextColor={"#484848"}
+              style={styles.inputArticle}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: "RobotoLight",
+                color: "#484848",
+                marginTop: 20,
+              }}
+            >
+              Video name:
+            </Text>
+            <TextInput
+              value={state.video_name}
+              onChangeText={(text) => {
+                setState({ ...state, video_name: text });
+              }}
+              placeholderTextColor={"#484848"}
+              style={styles.inputTopic}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: "RobotoLight",
+                color: "#484848",
+                marginTop: 20,
+              }}
+            >
+              URL of video:
+            </Text>
+            <TextInput
+              value={state.video_url}
+              onChangeText={(text) => {
+                setState({ ...state, video_url: text });
+              }}
+              placeholderTextColor={"#484848"}
+              style={styles.inputTopic}
+            />
+            {route.params.lesson == undefined ? (
+              <TouchableOpacity onPress={EditLesson} style={styles.buttonPost}>
+                <Text style={styles.text}>Edit</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={Create} style={styles.buttonPost}>
+                <Text style={styles.text}>Save</Text>
+              </TouchableOpacity>
+            )}
+          </KeyboardAvoidingScrollView>
         </View>
       </ScrollView>
     </View>
@@ -120,7 +274,9 @@ const styles = StyleSheet.create({
   },
   buttonAdd: {
     width: "100%",
-    height: 165,
+    minHeight: 165,
+    maxHeight: 600,
+
     backgroundColor: "#FFFFFF",
     marginTop: 12,
     alignItems: "center",

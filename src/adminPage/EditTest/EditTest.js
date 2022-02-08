@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -23,7 +23,30 @@ import {
   EvilIcons,
 } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("screen");
+import { useRecoilState, useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import { apiservice } from "../../service/api";
+import { useIsFocused } from "@react-navigation/native";
 export default function EditTest({ navigation }) {
+  const [token, setToken] = useRecoilState(tokenState);
+  const isfocused = useIsFocused();
+  const [lesson, setLesson] = useState();
+  useEffect(() => {
+    if (isfocused) {
+      getLesson();
+    }
+  }, [isfocused]);
+  const getLesson = async () => {
+    const res = await apiservice({
+      path: "/lesson/getalllesson",
+      method: "get",
+    });
+
+    if (res.status == 200) {
+      setLesson(res.data);
+    } else {
+    }
+  };
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -57,16 +80,16 @@ export default function EditTest({ navigation }) {
           <FlatList
             numColumns={1}
             style={{ marginBottom: 20 }}
-            data={[{ n: "" }]}
+            data={lesson}
             renderItem={({ item, index }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("ExamTest");
+                    navigation.navigate("ExamTest", item);
                   }}
                   style={styles.button}
                 >
-                  <Text style={styles.textSubject}>{"Plant"}</Text>
+                  <Text style={styles.textSubject}>{item.title}</Text>
                 </TouchableOpacity>
               );
             }}

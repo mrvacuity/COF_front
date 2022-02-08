@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -24,8 +24,43 @@ import {
   EvilIcons,
 } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("screen");
+import { useRecoilState } from "recoil";
+import { tokenState } from "../../recoil/recoil";
+import { apiservice } from "../../service/api";
+import { useIsFocused } from "@react-navigation/native";
+import moment from "moment";
+import { authActionDeleteFeed } from "../../action/authAction";
 export default function EditArticle({ navigation }) {
+  const [token, setToken] = useRecoilState(tokenState);
   const [modalVisible, setModalVisible] = useState(false);
+  const [data, setData] = useState([]);
+  const [id_feed, setId_feed] = useState();
+  const isfocused = useIsFocused();
+  useEffect(() => {
+    if (isfocused) {
+      getFeed(token);
+    }
+  }, [isfocused]);
+  const getFeed = async () => {
+    const res = await apiservice({
+      path: "/lesson/getallfeed",
+      method: "get",
+      token: token.accessToken,
+    });
+
+    if (res.status == 200) {
+      setData(res.data);
+    }
+  };
+  async function deleteFeed() {
+    const del = await authActionDeleteFeed({
+      id: id_feed,
+    });
+    if (del) {
+      setModalVisible(!modalVisible);
+      getFeed(token);
+    }
+  }
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -51,16 +86,20 @@ export default function EditArticle({ navigation }) {
         </View>
         <FlatList
           numColumns={1}
-          style={{}}
-          data={[{ n: 1 }]}
+          style={{ marginBottom: 20 }}
+          data={data.sort((a, b) => b.id - a.id)}
           renderItem={({ item, index }) => {
+            console.log(item);
             return (
               <View style={styles.buttonDetail1}>
                 <View style={{ width: "35%" }}>
                   <Image
                     style={{ width: 103, height: 103, borderRadius: 15 }}
                     source={{
-                      uri: "https://s3-alpha-sig.figma.com/img/0b78/bc4e/d3fe54cf10398ded53d27d28d8f232a9?Expires=1642982400&Signature=Esc91X7XNwTELGtsMgkaRMIT3O210~TVLe4StAWpXNDcsxgk34PbDAGIWg~4k07DrziTKwf3jHvhXiinXYDNBmCF6rcBYN6FeAabZLLV~tY5aioSDe2XnVKexa~-U3kMGfujDLGmOqwUYNTmccNvWLXVc72~RFjedtluAMyycpD6q2B0EBKFGyerwt6rYP4D1ek~cYWSY1knenDoIAoPOJc~yBPflvSnExKjtaImWxro0i6tMBjE~oOHxbdQ4Qjla32EHOhDCEDL4jVYqVbD6cU7CnYL4kylDnjUk0slgIVNiJnsdVeqvdeTDPEFUqtAo5C4rYm5IFYOaFQ3ats8bw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA",
+                      uri:
+                        item.image_url != null &&
+                        "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                          item.image_url,
                     }}
                   />
                 </View>
@@ -80,19 +119,21 @@ export default function EditArticle({ navigation }) {
                       >
                         ● Coffee
                       </Text>
-                      <Text style={styles.textDate1}>4/11/2564</Text>
+                      <Text style={styles.textDate1}>
+                        {moment(item.createdAt).format("DD/MM/YYYY")}
+                      </Text>
                     </View>
                     <Text
                       numberOfLines={2}
                       style={[styles.textDetail, { fontSize: 16 }]}
                     >
-                      About the new art deco for designers and artists
+                      {item.title}
                     </Text>
                     <Text
                       numberOfLines={1}
                       style={[styles.textDetail, { marginTop: 7 }]}
                     >
-                      User ID: 0000000001
+                      User ID: {item.user_model.id}
                     </Text>
                     <View
                       style={{
@@ -102,6 +143,7 @@ export default function EditArticle({ navigation }) {
                     >
                       <TouchableOpacity
                         onPress={() => {
+                          setId_feed(item.id);
                           setModalVisible(true);
                         }}
                       >
@@ -130,12 +172,7 @@ export default function EditArticle({ navigation }) {
               Are you sure to delete your articles?
             </Text>
             <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}
-                style={styles.buttonModal}
-              >
+              <TouchableOpacity onPress={deleteFeed} style={styles.buttonModal}>
                 <Text style={[styles.textButton, { fontFamily: "Roboto" }]}>
                   Yes
                 </Text>

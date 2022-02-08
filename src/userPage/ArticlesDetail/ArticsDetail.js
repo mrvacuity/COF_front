@@ -36,16 +36,27 @@ export default function ArticsDetail({ navigation, route }) {
   // const data = route.params;
   const [data, setdata] = useState(route.params);
 
-  console.log("route.paramsroute.params", route.params);
   const [token, setToken] = useRecoilState(tokenState);
+
   const [like, setLike] = useState(false);
   const focus = useIsFocused();
   const [state, setState] = useState({
     comment: "",
     feed_id: data.id,
-    uid: data.uid,
+    uid: "",
   });
+  const getProfile = async () => {
+    const res = await apiservice({
+      path: "/authen/user",
+      method: "get",
+      token: token.accessToken,
+    });
 
+    if (res.status == 200) {
+      setState({ ...state, uid: res.data.result.id });
+    } else {
+    }
+  };
   const getFeed = async () => {
     const res = await apiservice({
       path: "/lesson/getallfeed",
@@ -92,6 +103,7 @@ export default function ArticsDetail({ navigation, route }) {
     if (focus) {
       getFeed();
       getLike();
+      getProfile();
     }
   }, [focus]);
 
@@ -140,7 +152,6 @@ export default function ArticsDetail({ navigation, route }) {
                   });
 
                   if (res.status == 200) {
-                    console.log(res.data.data);
                     if (res.data.data != 1) {
                       setLike(true);
                     } else {

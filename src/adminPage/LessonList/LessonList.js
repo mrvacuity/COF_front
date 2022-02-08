@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -23,9 +23,41 @@ import {
   Ionicons,
   EvilIcons,
 } from "@expo/vector-icons";
+
 const { width, height } = Dimensions.get("screen");
-export default function LessonList({ navigation }) {
+import { useIsFocused } from "@react-navigation/native";
+import { apiservice } from "../../service/api";
+import { authActionDeleteComponent } from "../../action/authAction";
+export default function LessonList({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
+  const [data, setData] = useState(route.params.lesson);
+  const [id, setid] = useState();
+
+  const focus = useIsFocused();
+
+  const getLesson = async () => {
+    const res = await apiservice({
+      path: "/lesson/getalllesson",
+      method: "get",
+    });
+
+    let a = res.data.filter((item) => {
+      return item.id == route.params.id;
+    });
+    setData(a[0].lesson);
+  };
+  async function Delete() {
+    const del = await authActionDeleteComponent({
+      id,
+    });
+    if (del) {
+      setModalVisible(!modalVisible);
+      getLesson();
+    }
+  }
+  useEffect(() => {
+    getLesson();
+  }, [focus]);
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -45,10 +77,10 @@ export default function LessonList({ navigation }) {
           >
             <Entypo name="chevron-thin-left" size={24} color="#484848" />
           </TouchableOpacity>
-          <Text style={styles.textTitle}>Plant Species</Text>
+          <Text style={styles.textTitle}>{route.params.title} Species</Text>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("NewLesson");
+              navigation.navigate("NewLesson", route.params);
             }}
             style={{ width: "10%" }}
           >
@@ -58,15 +90,15 @@ export default function LessonList({ navigation }) {
         <FlatList
           numColumns={1}
           style={{ marginBottom: 20 }}
-          data={[{ n: "" }]}
+          data={data}
           renderItem={({ item, index }) => {
             return (
               <View style={styles.button}>
-                <Text style={styles.textSubject}>{"Arabica"}</Text>
+                <Text style={styles.textSubject}>{item.title}</Text>
                 <View style={{ flexDirection: "row" }}>
                   <TouchableOpacity
                     onPress={() => {
-                      navigation.navigate("NewLesson");
+                      navigation.navigate("NewLesson", item);
                     }}
                     style={{ marginRight: 10 }}
                   >
@@ -74,6 +106,7 @@ export default function LessonList({ navigation }) {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
+                      setid(item.id);
                       setModalVisible(true);
                     }}
                   >
@@ -100,12 +133,7 @@ export default function LessonList({ navigation }) {
               Are you sure to delete this lesson?
             </Text>
             <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}
-                style={styles.buttonModal}
-              >
+              <TouchableOpacity onPress={Delete} style={styles.buttonModal}>
                 <Text style={[styles.textButton, { fontFamily: "Roboto" }]}>
                   Yes
                 </Text>

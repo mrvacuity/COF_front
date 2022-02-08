@@ -29,6 +29,8 @@ export default function Camara({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [isPreview, setIsPreview] = useState(false);
+  const [imageTODO, setimageTODO] = useState({});
+
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [result, setResult] = useState(false);
   const [submit, setSubmit] = useState(false);
@@ -52,14 +54,14 @@ export default function Camara({ navigation }) {
       quality: 0.4,
       base64: true,
     });
-    setResult(true);
 
     let localUri = result.uri;
     let filename = localUri.split("/").pop();
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
-    let formData = new FormData();
-    formData.append("file", { uri: localUri, name: filename, type });
+    // let formData = new FormData();
+    setimageTODO({ uri: localUri, name: filename, type });
+    // formData.append("file", { uri: localUri, name: filename, type });
 
     const base64upload = await apiservice({
       path: "/image/create",
@@ -71,22 +73,22 @@ export default function Camara({ navigation }) {
     });
 
     setDefaultsImage(base64upload.data.imageRefId);
+    setPage(2);
+    // const res = await axios.post(
+    //   "https://getprediction-eb7wj7y6sa-as.a.run.app",
+    //   formData,
+    //   {
+    //     headers: { "Content-Type": "multipart/form-data" },
+    //   }
+    // );
 
-    const res = await axios.post(
-      "https://getprediction-eb7wj7y6sa-as.a.run.app",
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-
-    if (res.status == 200) {
-      serResults(res.data["Prediction (pH)"]);
-      setPage(2);
-      setResult(false);
-    } else {
-      setResult(false);
-    }
+    // if (res.status == 200) {
+    //   serResults(res.data["Prediction (pH)"]);
+    //   setPage(2);
+    //   setResult(false);
+    // } else {
+    //   setResult(false);
+    // }
 
     // const res = await apiservice({
     //   path: "/image/create",
@@ -113,7 +115,6 @@ export default function Camara({ navigation }) {
     // if (cameraRef.current) {
     const options = { quality: 0.7, base64: true };
     const result = await cameraRef.current.takePictureAsync(options);
-    setResult(true);
 
     console.log(result.uri);
     // const source = data.base64;
@@ -122,8 +123,7 @@ export default function Camara({ navigation }) {
     let filename = localUri.split("/").pop();
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
-    let formData = new FormData();
-    formData.append("file", { uri: localUri, name: filename, type });
+    setimageTODO({ uri: localUri, name: filename, type });
 
     const base64upload = await apiservice({
       path: "/image/create",
@@ -135,23 +135,7 @@ export default function Camara({ navigation }) {
     });
 
     setDefaultsImage(base64upload.data.imageRefId);
-
-    const res = await axios.post(
-      "https://getprediction-eb7wj7y6sa-as.a.run.app",
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-
-    if (res.status == 200) {
-      serResults(res.data["Prediction (pH)"]);
-      setPage(2);
-      setResult(false);
-    } else {
-      setResult(false);
-    }
-
+    setPage(2);
     // if (source) {
     //   await cameraRef.current.pausePreview();
     //   setIsPreview(true);
@@ -258,20 +242,39 @@ export default function Camara({ navigation }) {
           <View style={{ alignSelf: "center", marginTop: 25 }}>
             <TouchableOpacity
               onPress={async () => {
-                const res = await apiservice({
-                  path: "/lesson/createhistory",
-                  method: "post",
-                  body: {
-                    Sour: results,
-                    Sweet: 0,
-                    image_url: DefaultsImage,
-                    total: 0,
-                  },
-                  token: token.accessToken,
-                });
+                setResult(true);
+                let formData = new FormData();
+                formData.append("file", imageTODO);
+
+                const res = await axios.post(
+                  "https://getprediction-eb7wj7y6sa-as.a.run.app",
+                  formData,
+                  {
+                    headers: { "Content-Type": "multipart/form-data" },
+                  }
+                );
 
                 if (res.status == 200) {
-                  setPage(3);
+                  serResults(res.data["Prediction (pH)"]);
+
+                  setResult(false);
+                  const res1 = await apiservice({
+                    path: "/lesson/createhistory",
+                    method: "post",
+                    body: {
+                      Sour: res.data["Prediction (pH)"],
+                      Sweet: 0,
+                      image_url: DefaultsImage,
+                      total: 0,
+                    },
+                    token: token.accessToken,
+                  });
+
+                  if (res1.status == 200) {
+                    setPage(3);
+                  }
+                } else {
+                  setResult(false);
                 }
               }}
               style={styles.button}

@@ -107,6 +107,58 @@ export async function authActionEditFeed({ state, token }) {
     throw error;
   }
 }
+export async function authActionEditLesson({ state, token, id }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/updatelesson/" + id,
+      method: "put",
+      body: state,
+      token: token,
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+export async function authActionEditComponent({ state, token, id }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/updatecomponent/" + id,
+      method: "put",
+      body: state,
+      token: token,
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+export async function authActionDeleteComponent({ id }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/deletecomponent/" + id,
+      method: "delete",
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
 export async function authActionCreateFeed({ state, token }) {
   try {
     const response = await apiservice({
@@ -125,11 +177,80 @@ export async function authActionCreateFeed({ state, token }) {
     throw error;
   }
 }
+export async function authActionCreateTest({ state }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/createtest",
+      method: "post",
+      body: state,
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
 export async function authActionDeleteFeed({ id }) {
   try {
     const response = await apiservice({
       path: "/lesson/deletefeed?id=" + id,
       method: "delete",
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+export async function authActionDeleteLesson({ id }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/deletelesson/" + id,
+      method: "delete",
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+export async function authActionCreateLesson({ state, token }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/createlesson",
+      method: "post",
+      body: state,
+      token: token,
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+export async function authActionCreateComponent({ state, token }) {
+  try {
+    const response = await apiservice({
+      path: "/lesson/createcomponent",
+      method: "post",
+      body: state,
+      token: token,
     });
     if (response.status == 200) {
       return response.data;

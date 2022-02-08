@@ -26,7 +26,7 @@ export default function Lesson({ navigation, route }) {
   const data = route.params.lesson;
   const data1 = route.params;
   const [tab, setTab] = useState(0);
-  console.log("datav", data);
+  console.log("datav", data[0]);
   if (data == null) {
     return null;
   }
@@ -89,64 +89,14 @@ export default function Lesson({ navigation, route }) {
                       },
                     ]}
                   >
-                    <Text style={styles.textLight}>{item.title}</Text>
+                    <Text style={[styles.textLight, { textAlign: "center" }]}>
+                      {item.title}
+                    </Text>
                   </TouchableOpacity>
                 );
               }}
             />
           </View>
-          {/* <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <TouchableOpacity
-              onPress={() => {
-                setPage(1);
-                setTestLight(false);
-                setTestDark(false);
-                setTestMedium(false);
-              }}
-              style={[
-                styles.selextPage1,
-                {
-                  backgroundColor: page == 1 ? "#FFFFFF" : "#E6E6E6",
-                },
-              ]}
-            >
-              <Text style={styles.textLight}>Light</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setPage(2);
-                setTestLight(false);
-                setTestDark(false);
-                setTestMedium(false);
-              }}
-              style={[
-                styles.selectPage2,
-                {
-                  backgroundColor: page == 2 ? "#FFFFFF" : "#E6E6E6",
-                },
-              ]}
-            >
-              <Text style={[styles.textLight]}>Medium</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setPage(3);
-                setTestLight(false);
-                setTestDark(false);
-                setTestMedium(false);
-              }}
-              style={[
-                styles.selectPage2,
-                {
-                  backgroundColor: page == 3 ? "#FFFFFF" : "#DCDCDC",
-                  zIndex: 3,
-                },
-              ]}
-            >
-              <Text style={[styles.textLight]}>Dark</Text>
-            </TouchableOpacity>
-          </View> */}
-
           <View style={styles.viewPage}>
             <View
               style={{
@@ -178,116 +128,32 @@ export default function Lesson({ navigation, route }) {
                 </TouchableOpacity>
               )}
             </View>
-            <Image
-              style={styles.viewImgCoffee}
-              source={{
-                uri:
-                  "https://api-cof.wishesexistence.co/api/image/getimage/" +
-                  data[tab].image_url,
-              }}
-            />
-            <Text style={styles.textLight}>{data[tab].description}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Video", route.params.lesson[tab]);
-              }}
-              style={styles.buttonVideo}
-            >
-              <Text style={styles.textLight}>Video</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* { page == 2 ? (
-            <View style={styles.viewPage}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  width: "120%",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
-                  {data[1].title}
-                </Text>
-                {testMedium ? (
-                  <TouchableOpacity
-                    onPress={() => {}}
-                    style={[styles.buttonTest, { width: 105 }]}
-                  >
-                    <Text style={styles.textLight}>{"Test >>>"}</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setTestMedium((val) => !val);
-                    }}
-                    style={styles.buttonTest}
-                  >
-                    <Text style={styles.textLight}>{"<<<"}</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+            {data[tab].image_url.img != null && data[tab].image_url.img != "" && (
               <Image
-                style={styles.viewImgCoffee}
-                source={{ uri: data[1].image_url }}
+                resizeMode="stretch"
+                style={[
+                  styles.viewImgCoffee,
+                  { height: data[tab].image_url.height / 1.5 },
+                ]}
+                source={{
+                  uri:
+                    "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                    data[tab].image_url.img,
+                }}
               />
-              <Text style={styles.textLight}>{data[1].description}</Text>
+            )}
+            <Text style={styles.textLight}>{data[tab].description}</Text>
+            {data[tab].video_url != "" && (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Video", route.params.lesson[1]);
+                  navigation.navigate("Video", route.params.lesson[tab]);
                 }}
                 style={styles.buttonVideo}
               >
                 <Text style={styles.textLight}>Video</Text>
               </TouchableOpacity>
-            </View>
-          ) : (
-            page == 3 && (
-              <View style={styles.viewPage}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    width: "120%",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
-                    {data[2].title}
-                  </Text>
-                  {testDark ? (
-                    <TouchableOpacity
-                      onPress={() => {}}
-                      style={[styles.buttonTest, { width: 105 }]}
-                    >
-                      <Text style={styles.textLight}>{"Test >>>"}</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setTestDark((val) => !val);
-                      }}
-                      style={styles.buttonTest}
-                    >
-                      <Text style={styles.textLight}>{"<<<"}</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                <Image
-                  style={styles.viewImgCoffee}
-                  source={{ uri: data[2].image_url }}
-                />
-                <Text style={styles.textLight}>{data[2].description}</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("Video", route.params.lesson[2]);
-                  }}
-                  style={styles.buttonVideo}
-                >
-                  <Text style={styles.textLight}>Video</Text>
-                </TouchableOpacity>
-              </View>
-            )
-          )} */}
+            )}
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -346,13 +212,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     width: "100%",
     height: "100%",
-    borderTopRightRadius: 50,
+    borderTopRightRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 19,
   },
   viewImgCoffee: {
     width: "100%",
-    height: 200,
+
     backgroundColor: "#E5E5E5",
     borderRadius: 20,
     marginVertical: 18,

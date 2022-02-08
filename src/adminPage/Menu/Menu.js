@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -23,7 +23,10 @@ import {
   EvilIcons,
 } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("screen");
+import { useRecoilState, useRecoilValue } from "recoil";
+import { tokenState } from "../../recoil/recoil";
 export default function Menu({ navigation }) {
+  const [token, setToken] = useRecoilState(tokenState);
   const data = [
     { title: "Lesson", onPress: "EditLesson" },
     { title: "Article", onPress: "EditArticle" },
@@ -35,7 +38,27 @@ export default function Menu({ navigation }) {
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
 
       <View style={[styles.viewDetail]}>
-        <Text style={styles.textTitle}>Menu</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: 29,
+          }}
+        >
+          <Text style={{ width: "10%" }}></Text>
+          <Text style={styles.textTitle}>Menu</Text>
+
+          <TouchableOpacity
+            style={{ width: "10%", alignItems: "flex-end" }}
+            onPress={() => {
+              setToken("");
+              navigation.navigate("Login");
+            }}
+          >
+            <Feather name="log-out" size={24} color="#484848" />
+          </TouchableOpacity>
+        </View>
+
         <FlatList
           numColumns={1}
           style={{ marginBottom: 20 }}
