@@ -81,7 +81,7 @@ export default function Test({ navigation, route }) {
       <SafeAreaView />
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
       <View style={[styles.viewDetail]}>
-        <View style={{ height: height * 0.75 }}>
+        <View style={{ height: height * 0.7 }}>
           <Text style={[styles.textTitle, { alignSelf: "center" }]}>Test</Text>
           <Text
             style={[styles.textTitle, { width: "100%", textAlign: "left" }]}
@@ -99,66 +99,75 @@ export default function Test({ navigation, route }) {
               {quiz.length}
             </Text>
           )}
-          <FlatList
-            numColumns={1}
-            style={{}}
-            data={quiz}
-            renderItem={({ item, index }) => {
-              return (
-                <View
-                  style={{
-                    borderBottomWidth: 0.5,
-                    paddingVertical: 17,
-                  }}
-                >
-                  <Text style={[styles.textLight, { marginBottom: 11 }]}>
-                    {item.title}
-                  </Text>
-                  {item.choice.map((data, indexs) => (
-                    <TouchableOpacity
-                      key={data}
-                      style={[styles.buttonSelect, {}]}
-                      onPress={() => {
-                        setAns((val) => {
-                          return val.filter((e) => e.number != index);
-                        });
-                        setAns((val) =>
-                          val.concat({
-                            number: index,
-                            myAns: data,
-                            Answer: item.answer,
-                          })
-                        );
-                      }}
-                    >
-                      <FontAwesome
-                        name={
-                          ans.filter(
-                            (e) => e.myAns == data && e.number == index
-                          ).length > 0
-                            ? "dot-circle-o"
-                            : "circle-thin"
-                        }
-                        size={14}
-                        color="#484848"
-                      />
-
-                      <Text
+          <View>
+            <FlatList
+              numColumns={1}
+              style={{ marginBottom: 20 }}
+              data={quiz}
+              renderItem={({ item, index }) => {
+                return (
+                  <View
+                    style={{
+                      borderBottomWidth: 0.5,
+                      paddingVertical: 17,
+                    }}
+                  >
+                    <Text style={[styles.textLight, { marginBottom: 11 }]}>
+                      {item.title}
+                    </Text>
+                    {item.choice.map((data, indexs) => (
+                      <TouchableOpacity
+                        disabled={status ? true : false}
+                        key={data}
                         style={[
-                          styles.textLight,
-                          { fontSize: 14, marginLeft: 5 },
+                          styles.buttonSelect,
+                          {
+                            backgroundColor:
+                              status &&
+                              data == item.answer &&
+                              "rgba(174, 195, 160, 0.19)",
+                          },
                         ]}
+                        onPress={() => {
+                          setAns((val) => {
+                            return val.filter((e) => e.number != index);
+                          });
+                          setAns((val) =>
+                            val.concat({
+                              number: index,
+                              myAns: data,
+                              Answer: item.answer,
+                            })
+                          );
+                        }}
                       >
-                        {data}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              );
-            }}
-          />
-        </View>
-        <View style={{ height: height * 0.06 }}>
+                        <FontAwesome
+                          name={
+                            ans.filter(
+                              (e) => e.myAns == data && e.number == index
+                            ).length > 0
+                              ? "dot-circle-o"
+                              : "circle-thin"
+                          }
+                          size={14}
+                          color="#484848"
+                        />
+
+                        <Text
+                          style={[
+                            styles.textLight,
+                            { fontSize: 14, marginLeft: 5 },
+                          ]}
+                        >
+                          {data}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                );
+              }}
+            />
+          </View>
           {!status ? (
             <TouchableOpacity onPress={send} style={styles.buttonDone}>
               <Text
@@ -182,6 +191,30 @@ export default function Test({ navigation, route }) {
             </TouchableOpacity>
           )}
         </View>
+        {/* <View style={{ height: height * 0.04 }}>
+          {!status ? (
+            <TouchableOpacity onPress={send} style={styles.buttonDone}>
+              <Text
+                style={{ fontSize: 18, fontFamily: "Roboto", color: "#484848" }}
+              >
+                Done
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Home");
+              }}
+              style={[styles.buttonDone, { width: 154 }]}
+            >
+              <Text
+                style={{ fontSize: 18, fontFamily: "Roboto", color: "#484848" }}
+              >
+                Back to lesson
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View> */}
       </View>
     </View>
   );
@@ -194,7 +227,7 @@ const styles = StyleSheet.create({
   },
   viewDetail: {
     width: "100%",
-    height: "90%",
+    height: "100%",
     backgroundColor: "#f0e9e4",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,

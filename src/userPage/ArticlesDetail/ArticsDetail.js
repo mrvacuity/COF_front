@@ -35,10 +35,10 @@ const { width, height } = Dimensions.get("screen");
 export default function ArticsDetail({ navigation, route }) {
   // const data = route.params;
   const [data, setdata] = useState(route.params);
-
-  const [token, setToken] = useRecoilState(tokenState);
-
   const [like, setLike] = useState(false);
+  const [token, setToken] = useRecoilState(tokenState);
+  const [id, setid] = useState();
+
   const focus = useIsFocused();
   const [state, setState] = useState({
     comment: "",
@@ -53,6 +53,12 @@ export default function ArticsDetail({ navigation, route }) {
     });
 
     if (res.status == 200) {
+      let l = data.like_models.filter((i) => {
+        return i.uid == res.data.result.id;
+      });
+      if (l[0] != undefined) {
+        setLike(true);
+      }
       setState({ ...state, uid: res.data.result.id });
     } else {
     }

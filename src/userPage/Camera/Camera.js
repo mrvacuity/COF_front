@@ -289,30 +289,47 @@ export default function Camara({ navigation }) {
             </View>
           ) : (
             page == 3 && (
-              <View style={{ paddingHorizontal: 24 }}>
-                <View style={styles.viewTopic}>
-                  <Text style={styles.textSuject}>Result</Text>
-                  <Text style={styles.textDate}>
-                    Date : {moment().format("DD/MM/YYYYY")} Time :{" "}
-                    {moment().format("HH:mm")}
-                  </Text>
-                </View>
-                <View style={styles.viewTopic}>
-                  <Text style={styles.textSujectLight}>Sour</Text>
-                  <Text style={styles.textSujectLight}>
-                    pH{results.toFixed(2)}
-                  </Text>
-                </View>
-                {/* <View style={styles.viewTopic}>
+              <View>
+                <Image
+                  style={[
+                    styles.camera,
+                    {
+                      width: width * 0.94,
+                      backgroundColor: "#000",
+                      height: 353,
+                    },
+                  ]}
+                  source={{
+                    uri:
+                      "http://144.126.242.196:5000/api/image/getimage/" +
+                      DefaultsImage.replace(".png", ""),
+                  }}
+                />
+                <View style={{ paddingHorizontal: 24 }}>
+                  <View style={styles.viewTopic}>
+                    <Text style={styles.textSuject}>Result</Text>
+                    <Text style={styles.textDate}>
+                      Date : {moment().format("DD/MM/YYYYY")} Time :{" "}
+                      {moment().format("HH:mm")}
+                    </Text>
+                  </View>
+                  <View style={styles.viewTopic}>
+                    <Text style={styles.textSujectLight}>Sour</Text>
+                    <Text style={styles.textSujectLight}>
+                      pH{results.toFixed(2)}
+                    </Text>
+                  </View>
+                  {/* <View style={styles.viewTopic}>
                 <Text style={styles.textSujectLight}>Sweetness</Text>
                 <Text style={styles.textSujectLight}>20 brix</Text>
               </View> */}
-                {/* <View style={styles.viewTopic}>
+                  {/* <View style={styles.viewTopic}>
                 <Text style={styles.textSujectLight}>
                   Total dissolved solids (TDS)
                 </Text>
                 <Text style={styles.textSujectLight}>40 ppm</Text>
               </View> */}
+                </View>
               </View>
             )
           )}
