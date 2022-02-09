@@ -211,6 +211,7 @@ export default function Login({ navigation }) {
       setWarningLogin(true);
     }
   };
+
   const emailValid =
     /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
   function errors({ value, type }) {

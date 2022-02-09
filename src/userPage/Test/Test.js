@@ -124,28 +124,57 @@ export default function Test({ navigation, route }) {
                           {
                             backgroundColor:
                               status &&
-                              data == item.answer &&
-                              "rgba(174, 195, 160, 0.19)",
+                              ans.filter((value) => {
+                                return (
+                                  value.number == index && value.myAns == data
+                                );
+                              }).length > 0 // เลือก
+                                ? ans.filter((value) => {
+                                    return value.number == index;
+                                  })[0].myAns == item.answer
+                                  ? "rgba(174, 195, 160, 0.19)"
+                                  : "rgba(202, 164, 159, 0.19)"
+                                : indexs == item.answer
+                                ? "rgba(174, 195, 160, 0.19)"
+                                : "#f0e9e4",
                           },
                         ]}
                         onPress={() => {
-                          setAns((val) => {
-                            return val.filter((e) => e.number != index);
-                          });
-                          setAns((val) =>
-                            val.concat({
-                              number: index,
-                              myAns: data,
-                              Answer: item.answer,
-                            })
-                          );
+                          if (
+                            ans.filter((value) => {
+                              return value.number == index;
+                            }).length > 0
+                          ) {
+                            setAns((val) =>
+                              val.map((values) => {
+                                if (values.number == index) {
+                                  return {
+                                    ...values,
+                                    myAns: data,
+                                  };
+                                } else {
+                                  return values;
+                                }
+                              })
+                            );
+                          } else {
+                            setAns((val) =>
+                              val.concat({
+                                number: index,
+                                myAns: data,
+                                Answer: item.answer,
+                              })
+                            );
+                          }
                         }}
                       >
                         <FontAwesome
                           name={
-                            ans.filter(
-                              (e) => e.myAns == data && e.number == index
-                            ).length > 0
+                            ans.filter((value) => {
+                              return (
+                                value.number == index && value.myAns == data
+                              );
+                            }).length > 0
                               ? "dot-circle-o"
                               : "circle-thin"
                           }
