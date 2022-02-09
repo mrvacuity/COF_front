@@ -40,7 +40,6 @@ export default function HistoryResult({ navigation }) {
     });
 
     if (res.status == 200) {
-      console.log(res.data);
       setData(res.data);
     }
   }

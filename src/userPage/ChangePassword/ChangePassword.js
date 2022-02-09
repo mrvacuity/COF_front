@@ -50,7 +50,6 @@ export default function ChangePassword({ navigation }) {
 
     if (res.status == 200) {
       setUser(res.data.result.id);
-      console.log(res.data.result.id);
     } else {
     }
   };
@@ -62,7 +61,7 @@ export default function ChangePassword({ navigation }) {
           token: token.accessToken,
           user,
         });
-        console.log(user);
+
         if (reset) {
           setTimeout(() => {
             setModalVisible1(true);
@@ -72,7 +71,6 @@ export default function ChangePassword({ navigation }) {
             navigation.goBack("");
           }, 3500);
         } else {
-          console.log(reset);
           setModalVisible2(true);
         }
       } else {

@@ -34,7 +34,7 @@ import {
 } from "../../action/authAction";
 export default function NewLesson({ navigation, route }) {
   const [token, setToken] = useRecoilState(tokenState);
-  console.log("ttttttttttt", route.params);
+
   const [image, setImage] = useState();
   const [state, setState] = useState({
     video_url: route.params.lesson == undefined ? route.params.video_url : "",
@@ -53,7 +53,7 @@ export default function NewLesson({ navigation, route }) {
         ? route.params.id
         : route.params.lesson_id,
   });
-  console.log("statestate", state);
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -169,7 +169,7 @@ export default function NewLesson({ navigation, route }) {
                   }}
                   source={{
                     uri:
-                      "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                      "http://144.126.242.196:5000/api/image/getimage/" +
                       state.image_url.img,
                   }}
                 />

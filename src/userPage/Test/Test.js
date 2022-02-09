@@ -28,14 +28,13 @@ export default function Test({ navigation, route }) {
   const [quiz, setQuiz] = useState([]);
   const [choice, setchoice] = useState("");
   const [ans, setAns] = useState([]);
-  console.log("eeeeee", ans.length);
-  console.log("8888", quiz.length);
+
   const [state, setState] = useState({
     Type: "POSTTEST",
     lesson_id: route.params.id,
     score: "",
   });
-  console.log("statestate", state);
+
   const [status, setStatus] = useState(false);
   useEffect(() => {
     getTest();
@@ -67,10 +66,8 @@ export default function Test({ navigation, route }) {
     });
 
     if (res.status == 200) {
-      console.log(res.data.data);
       setQuiz(res.data.data);
     } else {
-      console.log("error");
     }
   };
 

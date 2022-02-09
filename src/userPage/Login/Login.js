@@ -203,7 +203,7 @@ export default function Login({ navigation }) {
         });
         setTimeout(() => {
           navigation.navigate("MyTabs");
-        }, 300);
+        }, 500);
       } else {
         setWarningLogin(true);
       }
@@ -543,7 +543,7 @@ export default function Login({ navigation }) {
                         }}
                         source={{
                           uri:
-                            // "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                            // "http://144.126.242.196:5000/api/image/getimage/" +
                             image,
                         }}
                       />

@@ -85,7 +85,7 @@ function MyTabs() {
       screenOptions={{ headerShown: false }}
       tabBarOptions={{
         activeTintColor: "#CCCCCC",
-        style: { height: 85 },
+        style: { height: 50 },
       }}
     >
       <Tab.Screen

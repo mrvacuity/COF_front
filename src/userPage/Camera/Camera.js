@@ -38,8 +38,6 @@ export default function Camara({ navigation }) {
   const [DefaultsImage, setDefaultsImage] = useState("");
   const token = useRecoilValue(tokenState);
 
-  console.log(DefaultsImage);
-
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -67,7 +65,7 @@ export default function Camara({ navigation }) {
       path: "/image/create",
       method: "post",
       body: {
-        name: result.uri.split("/").reverse()[0],
+        name: "ANALYSIS" + result.uri.split("/").reverse()[0],
         base64: "data:image/png;base64," + result.base64,
       },
     });
@@ -116,7 +114,6 @@ export default function Camara({ navigation }) {
     const options = { quality: 0.7, base64: true };
     const result = await cameraRef.current.takePictureAsync(options);
 
-    console.log(result.uri);
     // const source = data.base64;
 
     let localUri = result.uri;
@@ -129,7 +126,7 @@ export default function Camara({ navigation }) {
       path: "/image/create",
       method: "post",
       body: {
-        name: result.uri.split("/").reverse()[0],
+        name: "ANALYSIS" + result.uri.split("/").reverse()[0],
         base64: "data:image/png;base64," + result.base64,
       },
     });
@@ -151,175 +148,176 @@ export default function Camara({ navigation }) {
   }
   return (
     <View style={styles.container}>
-      <SafeAreaView />
-      <Modal transparent={true} visible={result}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#00000080",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <ActivityIndicator size={"large"} />
-        </View>
-      </Modal>
-      <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
-
-      <View style={[styles.viewDetail]}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 29,
-          }}
-        >
-          {page == 3 ? (
-            <TouchableOpacity
-              onPress={() => {
-                setPage(1);
-              }}
-            >
-              <SimpleLineIcons name="reload" size={20} color="#484848" />
-            </TouchableOpacity>
-          ) : (
-            <Text style={{ width: "10%" }}></Text>
-          )}
-
-          <Text style={styles.textTitle}>Camera</Text>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("HistoryResult");
+      <SafeAreaView>
+        <Modal transparent={true} visible={result}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "#00000080",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <MaterialCommunityIcons
-              name="clock-time-four-outline"
-              size={26}
-              color="#484848"
-            />
-          </TouchableOpacity>
-        </View>
-        {page == 1 && (
-          <Camera
-            style={styles.camera}
-            type={type}
-            onCameraReady={onCameraReady}
-            ref={cameraRef}
-          ></Camera>
-        )}
-        {page == 2 && (
-          <Image
-            style={[
-              styles.camera,
-              { width: width * 0.9, backgroundColor: "#000" },
-            ]}
-            source={{
-              uri:
-                "https://api-cof.wishesexistence.co/api/image/getimage/" +
-                DefaultsImage.replace(".png", ""),
-            }}
-          />
-        )}
-        {page == 1 ? (
-          <View style={styles.viewCapture}>
-            <Text style={{ width: "15%" }}></Text>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              disabled={!isCameraReady}
-              onPress={onSnap}
-              style={styles.capture}
-            >
-              <Image
-                style={{ width: 50, height: 50 }}
-                source={require("../../img/camera.png")}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={pickImage} style={{ marginRight: 30 }}>
-              <Feather name="image" size={30} color="#484848" />
-            </TouchableOpacity>
+            <ActivityIndicator size={"large"} />
           </View>
-        ) : page == 2 ? (
-          <View style={{ alignSelf: "center", marginTop: 25 }}>
-            <TouchableOpacity
-              onPress={async () => {
-                setResult(true);
-                let formData = new FormData();
-                formData.append("file", imageTODO);
+        </Modal>
+        <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
 
-                const res = await axios.post(
-                  "https://getprediction-eb7wj7y6sa-as.a.run.app",
-                  formData,
-                  {
-                    headers: { "Content-Type": "multipart/form-data" },
-                  }
-                );
+        <View style={[styles.viewDetail]}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 29,
+            }}
+          >
+            {page == 3 ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setPage(1);
+                }}
+              >
+                <SimpleLineIcons name="reload" size={20} color="#484848" />
+              </TouchableOpacity>
+            ) : (
+              <Text style={{ width: "10%" }}></Text>
+            )}
 
-                if (res.status == 200) {
-                  serResults(res.data["Prediction (pH)"]);
-
-                  setResult(false);
-                  const res1 = await apiservice({
-                    path: "/lesson/createhistory",
-                    method: "post",
-                    body: {
-                      Sour: res.data["Prediction (pH)"],
-                      Sweet: 0,
-                      image_url: DefaultsImage,
-                      total: 0,
-                    },
-                    token: token.accessToken,
-                  });
-
-                  if (res1.status == 200) {
-                    setPage(3);
-                  }
-                } else {
-                  setResult(false);
-                }
-              }}
-              style={styles.button}
-            >
-              <Text style={styles.textButton}>Submit</Text>
-            </TouchableOpacity>
+            <Text style={styles.textTitle}>Camera</Text>
             <TouchableOpacity
               onPress={() => {
-                setPage(1);
+                navigation.navigate("HistoryResult");
               }}
-              style={[styles.button, { backgroundColor: "#F0EAE6" }]}
             >
-              <Text style={styles.textButton}>Re-take</Text>
+              <MaterialCommunityIcons
+                name="clock-time-four-outline"
+                size={26}
+                color="#484848"
+              />
             </TouchableOpacity>
           </View>
-        ) : (
-          page == 3 && (
-            <View style={{ paddingHorizontal: 24 }}>
-              <View style={styles.viewTopic}>
-                <Text style={styles.textSuject}>Result</Text>
-                <Text style={styles.textDate}>
-                  Date : {moment().format("DD/MM/YYYYY")} Time :{" "}
-                  {moment().format("HH:mm")}
-                </Text>
-              </View>
-              <View style={styles.viewTopic}>
-                <Text style={styles.textSujectLight}>Sour</Text>
-                <Text style={styles.textSujectLight}>
-                  pH{results.toFixed(2)}
-                </Text>
-              </View>
-              {/* <View style={styles.viewTopic}>
+          {page == 1 && (
+            <Camera
+              style={styles.camera}
+              type={type}
+              onCameraReady={onCameraReady}
+              ref={cameraRef}
+            ></Camera>
+          )}
+          {page == 2 && (
+            <Image
+              style={[
+                styles.camera,
+                { width: width * 0.9, backgroundColor: "#000" },
+              ]}
+              source={{
+                uri:
+                  "http://144.126.242.196:5000/api/image/getimage/" +
+                  DefaultsImage.replace(".png", ""),
+              }}
+            />
+          )}
+          {page == 1 ? (
+            <View style={styles.viewCapture}>
+              <Text style={{ width: "15%" }}></Text>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                disabled={!isCameraReady}
+                onPress={onSnap}
+                style={styles.capture}
+              >
+                <Image
+                  style={{ width: 50, height: 50 }}
+                  source={require("../../img/camera.png")}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={pickImage} style={{ marginRight: 30 }}>
+                <Feather name="image" size={30} color="#484848" />
+              </TouchableOpacity>
+            </View>
+          ) : page == 2 ? (
+            <View style={{ alignSelf: "center", marginTop: 25 }}>
+              <TouchableOpacity
+                onPress={async () => {
+                  setResult(true);
+                  let formData = new FormData();
+                  formData.append("file", imageTODO);
+
+                  const res = await axios.post(
+                    "https://getprediction-eb7wj7y6sa-as.a.run.app",
+                    formData,
+                    {
+                      headers: { "Content-Type": "multipart/form-data" },
+                    }
+                  );
+
+                  if (res.status == 200) {
+                    serResults(res.data["Prediction (pH)"]);
+
+                    setResult(false);
+                    const res1 = await apiservice({
+                      path: "/lesson/createhistory",
+                      method: "post",
+                      body: {
+                        Sour: res.data["Prediction (pH)"],
+                        Sweet: 0,
+                        image_url: DefaultsImage,
+                        total: 0,
+                      },
+                      token: token.accessToken,
+                    });
+
+                    if (res1.status == 200) {
+                      setPage(3);
+                    }
+                  } else {
+                    setResult(false);
+                  }
+                }}
+                style={styles.button}
+              >
+                <Text style={styles.textButton}>Submit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setPage(1);
+                }}
+                style={[styles.button, { backgroundColor: "#F0EAE6" }]}
+              >
+                <Text style={styles.textButton}>Re-take</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            page == 3 && (
+              <View style={{ paddingHorizontal: 24 }}>
+                <View style={styles.viewTopic}>
+                  <Text style={styles.textSuject}>Result</Text>
+                  <Text style={styles.textDate}>
+                    Date : {moment().format("DD/MM/YYYYY")} Time :{" "}
+                    {moment().format("HH:mm")}
+                  </Text>
+                </View>
+                <View style={styles.viewTopic}>
+                  <Text style={styles.textSujectLight}>Sour</Text>
+                  <Text style={styles.textSujectLight}>
+                    pH{results.toFixed(2)}
+                  </Text>
+                </View>
+                {/* <View style={styles.viewTopic}>
                 <Text style={styles.textSujectLight}>Sweetness</Text>
                 <Text style={styles.textSujectLight}>20 brix</Text>
               </View> */}
-              {/* <View style={styles.viewTopic}>
+                {/* <View style={styles.viewTopic}>
                 <Text style={styles.textSujectLight}>
                   Total dissolved solids (TDS)
                 </Text>
                 <Text style={styles.textSujectLight}>40 ppm</Text>
               </View> */}
-            </View>
-          )
-        )}
-      </View>
+              </View>
+            )
+          )}
+        </View>
+      </SafeAreaView>
     </View>
   );
 }

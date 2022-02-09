@@ -29,8 +29,7 @@ export default function Pretest({ navigation, route }) {
   const [quiz, setQuiz] = useState([]);
   const [check, setCheck] = useState();
   const [ans, setAns] = useState([]);
-  console.log(ans.length);
-  console.log(quiz.length);
+
   const [state, setstate] = useState({
     lesson_id: route.params.id,
     score: "",

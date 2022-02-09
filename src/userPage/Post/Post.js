@@ -33,7 +33,7 @@ import { apiservice } from "../../service/api";
 const { width, height } = Dimensions.get("screen");
 export default function Post({ navigation, route }) {
   const [token, setToken] = useRecoilState(tokenState);
-  console.log("route++", route.params);
+
   const data = route.params;
   const [id, setId] = useState(route.params);
   const [image, setImage] = useState(null);
@@ -50,9 +50,9 @@ export default function Post({ navigation, route }) {
   });
 
   async function post() {
-    if (body.title != "" && body.description != "" && body.image_url != "") {
+    if (body.title != "" && body.image_url != "") {
       delete body.id;
-      console.log("OKK", body);
+
       const post = await authActionCreateFeed({
         state: body,
         token: token.accessToken,
@@ -71,9 +71,9 @@ export default function Post({ navigation, route }) {
       }
     }
   }
-  console.log("gggggg", body);
+
   async function postEdit() {
-    if (state.title != "" && state.description != "" && state.image_url != "") {
+    if (state.title != "" && state.image_url != "") {
       const edit = await authActionEditFeed({
         state,
         token: token.accessToken,
@@ -171,7 +171,7 @@ export default function Post({ navigation, route }) {
                 source={{
                   uri:
                     data != null && image == null
-                      ? "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                      ? "http://144.126.242.196:5000/api/image/getimage/" +
                         data.image_url
                       : image,
                 }}

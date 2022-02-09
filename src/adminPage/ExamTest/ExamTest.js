@@ -26,7 +26,7 @@ export default function ExamTest({ navigation, route }) {
   const [token, setToken] = useRecoilState(tokenState);
   const isfocused = useIsFocused();
   const [data, setData] = useState();
-  console.log(route.params.id);
+
   useEffect(() => {
     if (isfocused) {
       getTest();
@@ -94,7 +94,6 @@ export default function ExamTest({ navigation, route }) {
             style={{}}
             data={data}
             renderItem={({ item, index }) => {
-              console.log(item);
               return (
                 <View style={{ borderBottomWidth: 0.5, paddingVertical: 17 }}>
                   <Text style={[styles.textLight, { marginBottom: 11 }]}>

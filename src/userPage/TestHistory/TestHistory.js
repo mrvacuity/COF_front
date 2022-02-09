@@ -65,8 +65,6 @@ export default function TestHistory({ navigation }) {
     }
   };
 
-  console.log(score);
-
   return (
     <View style={styles.container}>
       <SafeAreaView />

@@ -40,7 +40,6 @@ export default function Home({ navigation }) {
     });
 
     if (res.status == 200) {
-      console.log("lessonn", res.data.lesson);
       setData(res.data);
     } else {
     }
@@ -70,8 +69,6 @@ export default function Home({ navigation }) {
     }
   };
 
-  console.log(score);
-
   if (userData == undefined) {
     return <View></View>;
   }
@@ -81,139 +78,151 @@ export default function Home({ navigation }) {
   }
   return (
     <View style={styles.container}>
-      <SafeAreaView />
-      <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={[styles.viewDetail]}>
-          <View style={{ paddingHorizontal: 29 }}>
-            <Text
-              style={[styles.textBold, { fontSize: 18, alignSelf: "center" }]}
-            >
-              HOME
-            </Text>
-            <Text
-              style={[styles.textRegular, { marginTop: 35, marginBottom: 8 }]}
-            >
-              {"Welcome back, " + userData.first_name + "!"}
-            </Text>
-            <Text style={styles.textLight}>Have you drunk yet?</Text>
-            <Text style={[styles.textBold, { fontSize: 18, marginTop: 12 }]}>
-              Lesson
-            </Text>
-          </View>
+      <SafeAreaView>
+        <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{
+            width: "100%",
+            minHeight: "100%",
+            backgroundColor: "#f0e9e4",
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+          }}
+        >
+          <View style={[styles.viewDetail]}>
+            <View style={{ paddingHorizontal: 29 }}>
+              <Text
+                style={[styles.textBold, { fontSize: 18, alignSelf: "center" }]}
+              >
+                HOME
+              </Text>
+              <Text
+                style={[styles.textRegular, { marginTop: 35, marginBottom: 8 }]}
+              >
+                {"Welcome back, " + userData.first_name + "!"}
+              </Text>
+              <Text style={styles.textLight}>Have you drunk yet?</Text>
+              <Text style={[styles.textBold, { fontSize: 18, marginTop: 12 }]}>
+                Lesson
+              </Text>
+            </View>
 
-          <FlatList
-            numColumns={1}
-            style={{ marginBottom: 20 }}
-            data={data}
-            extraData={score}
-            renderItem={({ item, index }) => {
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("Pretest", item);
-                  }}
-                  style={styles.viewHistory}
-                >
-                  <View style={{ width: "65%" }}>
-                    <Text style={styles.textRegular}>{item.title}</Text>
+            <FlatList
+              numColumns={1}
+              style={{ marginBottom: 20 }}
+              data={data}
+              extraData={score}
+              renderItem={({ item, index }) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("Pretest", item);
+                    }}
+                    style={styles.viewHistory}
+                  >
+                    <View style={{ width: "65%" }}>
+                      <Text style={styles.textRegular}>{item.title}</Text>
 
-                    <FlatList
-                      numColumns={1}
-                      style={{ marginLeft: 10, marginVertical: 12 }}
-                      data={item.lesson}
-                      renderItem={({ item, index }) => {
-                        return (
-                          <View>
-                            <Unorderedlist>
-                              <Text
-                                style={[
-                                  styles.textLight,
-                                  { fontSize: 13, color: "#484848" },
-                                ]}
-                              >
-                                {item.title}
-                              </Text>
-                            </Unorderedlist>
-                          </View>
-                        );
-                      }}
-                    />
+                      <FlatList
+                        numColumns={1}
+                        style={{ marginLeft: 10, marginVertical: 12 }}
+                        data={item.lesson}
+                        renderItem={({ item, index }) => {
+                          return (
+                            <View>
+                              <Unorderedlist>
+                                <Text
+                                  style={[
+                                    styles.textLight,
+                                    { fontSize: 13, color: "#484848" },
+                                  ]}
+                                >
+                                  {item.title}
+                                </Text>
+                              </Unorderedlist>
+                            </View>
+                          );
+                        }}
+                      />
 
-                    <Text
-                      style={[
-                        styles.textLight,
-                        { fontSize: 13, color: "#484848" },
-                      ]}
-                    >
-                      Pre-test:{"  "}
-                      {score.filter((items) => {
-                        return (
-                          items.lesson_id == item.id && items.Type == "PRETEST"
-                        );
-                      })[0]?.score == undefined
-                        ? "-"
-                        : score.filter((items) => {
-                            return (
-                              items.lesson_id == item.id &&
-                              items.Type == "PRETEST"
-                            );
-                          })[0]?.score + " %"}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.textLight,
-                        { fontSize: 13, color: "#484848" },
-                      ]}
-                    >
-                      Post-test:{" "}
-                      {score.filter((items) => {
-                        return (
-                          items.lesson_id == item.id && items.Type == "POSTTEST"
-                        );
-                      })[0]?.score == undefined
-                        ? "-"
-                        : score.filter((items) => {
-                            return (
-                              items.lesson_id == item.id &&
-                              items.Type == "POSTTEST"
-                            );
-                          })[0]?.score + " %"}
-                    </Text>
-                  </View>
-
-                  <View style={styles.viewImgHistorty}>
-                    <Image
-                      style={{ width: 100, height: 100 }}
-                      source={{
-                        uri:
-                          "https://api-cof.wishesexistence.co/api/image/getimage/" +
-                          item.image_url,
-                      }}
-                    />
-                    <View style={{ marginTop: 11 }}>
                       <Text
                         style={[
                           styles.textLight,
-                          { fontSize: 11, color: "#484848" },
+                          { fontSize: 13, color: "#484848" },
                         ]}
                       >
-                        {"Start >>>"}
+                        Pre-test:{"  "}
+                        {score.filter((items) => {
+                          return (
+                            items.lesson_id == item.id &&
+                            items.Type == "PRETEST"
+                          );
+                        })[0]?.score == undefined
+                          ? "-"
+                          : score.filter((items) => {
+                              return (
+                                items.lesson_id == item.id &&
+                                items.Type == "PRETEST"
+                              );
+                            })[0]?.score + " %"}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.textLight,
+                          { fontSize: 13, color: "#484848" },
+                        ]}
+                      >
+                        Post-test:{" "}
+                        {score.filter((items) => {
+                          return (
+                            items.lesson_id == item.id &&
+                            items.Type == "POSTTEST"
+                          );
+                        })[0]?.score == undefined
+                          ? "-"
+                          : score.filter((items) => {
+                              return (
+                                items.lesson_id == item.id &&
+                                items.Type == "POSTTEST"
+                              );
+                            })[0]?.score + " %"}
                       </Text>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        </View>
-      </ScrollView>
+
+                    <View style={styles.viewImgHistorty}>
+                      <Image
+                        style={{ width: 100, height: 100 }}
+                        source={{
+                          uri:
+                            "http://144.126.242.196:5000/api/image/getimage/" +
+                            item.image_url,
+                        }}
+                      />
+                      <View style={{ marginTop: 11 }}>
+                        <Text
+                          style={[
+                            styles.textLight,
+                            { fontSize: 11, color: "#484848" },
+                          ]}
+                        >
+                          {"Start >>>"}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFF",
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 12,
   },
   viewDetail: {

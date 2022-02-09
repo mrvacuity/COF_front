@@ -26,7 +26,7 @@ export default function Lesson({ navigation, route }) {
   const data = route.params.lesson;
   const data1 = route.params;
   const [tab, setTab] = useState(0);
-  console.log("datav", data[0]);
+
   if (data == null) {
     return null;
   }
@@ -137,22 +137,22 @@ export default function Lesson({ navigation, route }) {
                 ]}
                 source={{
                   uri:
-                    "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                    "http://144.126.242.196:5000/api/image/getimage/" +
                     data[tab].image_url.img,
                 }}
               />
             )}
-            <Text style={styles.textLight}>{data[tab].description}</Text>
             {data[tab].video_url != "" && (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Video", route.params.lesson[tab]);
+                  navigation.navigate("Video", data[tab]);
                 }}
                 style={styles.buttonVideo}
               >
                 <Text style={styles.textLight}>Video</Text>
               </TouchableOpacity>
             )}
+            <Text style={styles.textLight}>{data[tab].description}</Text>
           </View>
         </View>
       </ScrollView>
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 33,
     borderRadius: 5,
-    marginTop: 20,
+    marginVertical: 20,
     justifyContent: "center",
     alignItems: "center",
   },

@@ -41,8 +41,7 @@ export default function AddQuizTest({ navigation, route }) {
       Alert.alert("Please complete the information !");
     }
   }
-  console.log(route.params.title);
-  console.log(state);
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -89,7 +88,6 @@ export default function AddQuizTest({ navigation, route }) {
             style={{ marginBottom: 20 }}
             data={state.choice}
             renderItem={({ item, index }) => {
-              console.log(item);
               const mainItem = item;
               const mainIndex = index;
               return (

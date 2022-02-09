@@ -17,11 +17,9 @@ import {
   FontAwesome,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { Video, AVPlaybackStatus } from "expo-av";
 const { width, height } = Dimensions.get("screen");
+import YoutubePlayer from "react-native-youtube-iframe";
 export default function VideoPage({ navigation, route }) {
-  const video = React.useRef(null);
-  const [status, setStatus] = React.useState({});
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -43,7 +41,11 @@ export default function VideoPage({ navigation, route }) {
             <Entypo name="chevron-thin-left" size={24} color="black" />
           </TouchableOpacity>
           <Text style={styles.textTitle}>Video</Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("TestHistory");
+            }}
+          >
             <MaterialCommunityIcons
               name="clock-time-four-outline"
               size={26}
@@ -53,21 +55,16 @@ export default function VideoPage({ navigation, route }) {
         </View>
         <View style={styles.viewPage}>
           <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
-            Name of video
+            {route.params.video_name}
           </Text>
-          <Video
-            ref={video}
-            style={styles.video}
-            source={{
-              uri: "http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-            }}
-            onLoadStart={() => {
-              video.current.playAsync();
-            }}
-            useNativeControls
-            resizeMode="contain"
-            onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-          />
+
+          <View style={{ marginTop: 10 }}>
+            <YoutubePlayer
+              height={200}
+              play={true}
+              videoId={route.params.video_url}
+            />
+          </View>
         </View>
       </View>
     </View>

@@ -89,7 +89,6 @@ export default function EditArticle({ navigation }) {
           style={{ marginBottom: 20 }}
           data={data.sort((a, b) => b.id - a.id)}
           renderItem={({ item, index }) => {
-            console.log(item);
             return (
               <View style={styles.buttonDetail1}>
                 <View style={{ width: "35%" }}>
@@ -98,7 +97,7 @@ export default function EditArticle({ navigation }) {
                     source={{
                       uri:
                         item.image_url != null &&
-                        "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                        "http://144.126.242.196:5000/api/image/getimage/" +
                           item.image_url,
                     }}
                   />

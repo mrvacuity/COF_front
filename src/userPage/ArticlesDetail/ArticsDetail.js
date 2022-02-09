@@ -195,7 +195,7 @@ export default function ArticsDetail({ navigation, route }) {
               style={{ width: "100%", height: 184, backgroundColor: "#CCCCCC" }}
               source={{
                 uri:
-                  "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                  "http://144.126.242.196:5000/api/image/getimage/" +
                   data?.image_url,
               }}
             />

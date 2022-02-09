@@ -74,7 +74,7 @@ export default function EditLesson({ navigation }) {
       quality: 0.4,
       base64: true,
     });
-    console.log(result.width);
+
     const res = await apiservice({
       path: "/image/create",
       method: "post",
@@ -237,7 +237,7 @@ export default function EditLesson({ navigation }) {
                   style={{ width: "100%", height: 200 }}
                   source={{
                     uri:
-                      "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                      "http://144.126.242.196:5000/api/image/getimage/" +
                       state.image_url,
                   }}
                 />

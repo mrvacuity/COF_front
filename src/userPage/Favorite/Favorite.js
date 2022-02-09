@@ -49,7 +49,7 @@ export default function Favorite({ navigation }) {
       setData(res.data.data);
     }
   }
-  console.log("222222222", data);
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -98,7 +98,7 @@ export default function Favorite({ navigation }) {
                     }}
                     source={{
                       uri:
-                        "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                        "http://144.126.242.196:5000/api/image/getimage/" +
                         item?.info?.image_url,
                     }}
                   />

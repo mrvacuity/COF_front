@@ -40,7 +40,9 @@ export default function Articles({ navigation }) {
   const [myData, setMyData] = useState([]);
   const [search, setSearch] = useState("");
   const [id_feed, setId_feed] = useState();
-
+  const [mostlike, setmostlike] = useState(false);
+  const [lastest, setlastest] = useState(false);
+  const [oldest, setoldest] = useState(false);
   const isfocused = useIsFocused();
   useEffect(() => {
     if (isfocused) {
@@ -81,12 +83,13 @@ export default function Articles({ navigation }) {
     }
   };
 
-  if (data[0] == null) {
-    return null;
-  }
-  if (myData == null) {
-    return null;
-  }
+  // if (data[0] == null) {
+  //   return null;
+  // }
+  // if (myData == null) {
+  //   return null;
+  // }
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -168,7 +171,7 @@ export default function Articles({ navigation }) {
                             source={{
                               uri:
                                 item.image_url != null &&
-                                "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                                "http://144.126.242.196:5000/api/image/getimage/" +
                                   item.image_url,
                             }}
                           />
@@ -252,18 +255,9 @@ export default function Articles({ navigation }) {
                     <View style={styles.viewFillter}>
                       <TouchableOpacity
                         onPress={() => {
-                          // console.log(data);
-
-                          // const a = data.filter((a, b) => {
-                          //   console.log("AAAA", a.comment_model);
-                          //   return (
-                          //     b.comment_model.length - a.comment_model.length
-                          //   );
-                          // });
-                          // console.log(a);
-                          // setData(a);
-
-                          // setData(a);
+                          setmostlike(true);
+                          setoldest(false);
+                          setlastest(false);
                           setFillter(false);
                         }}
                         style={styles.buttonFillter}
@@ -272,6 +266,9 @@ export default function Articles({ navigation }) {
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() => {
+                          setmostlike(false);
+                          setoldest(false);
+                          setlastest(true);
                           setFillter(false);
                         }}
                         style={styles.buttonFillter}
@@ -280,6 +277,9 @@ export default function Articles({ navigation }) {
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() => {
+                          setmostlike(false);
+                          setoldest(true);
+                          setlastest(false);
                           setFillter(false);
                         }}
                         style={styles.buttonFillter}
@@ -290,137 +290,149 @@ export default function Articles({ navigation }) {
                   )}
                 </View>
               </View>
-              <FlatList
-                numColumns={1}
-                style={{ marginBottom: 40 }}
-                data={data.filter((item) => {
-                  return item.title.includes(search);
-                })}
-                // .filter((item) => {
-                //   return (
-                //     item.user_info.username.includes(search) ||
-                //     item.user_info.fristname.includes(search)
-                //   );
-                // })
-                renderItem={({ item, index }) => {
-                  return (
-                    index > 0 && (
-                      <View>
-                        <TouchableOpacity
-                          onPress={() => {
-                            navigation.navigate("ArticlesDetail", item);
-                          }}
-                          style={styles.buttonDetail}
-                        >
-                          <View style={{ width: "35%" }}>
-                            <Image
-                              style={{
-                                width: 103,
-                                height: 103,
-                                borderRadius: 15,
-                                backgroundColor: "#cccccc",
-                              }}
-                              source={{
-                                uri:
-                                  "https://api-cof.wishesexistence.co/api/image/getimage/" +
-                                  item.image_url,
-                              }}
-                            />
-                          </View>
-                          <View
+              <View style={{ zIndex: -1 }}>
+                <FlatList
+                  numColumns={1}
+                  style={{ marginBottom: 40 }}
+                  data={
+                    lastest
+                      ? data
+                          .filter((item) => {
+                            return item.title.includes(search);
+                          })
+                          .sort((a, b) => b.id - a.id)
+                      : oldest
+                      ? data
+                          .filter((item) => {
+                            return item.title.includes(search);
+                          })
+                          .sort((a, b) => a.id - b.id)
+                      : mostlike
+                      ? data
+                          .filter((item) => {
+                            return item.title.includes(search);
+                          })
+                          .sort(
+                            (a, b) =>
+                              b.like_models.length - a.like_models.length
+                          )
+                      : data.filter((item) => {
+                          return item.title.includes(search);
+                        })
+                  }
+                  renderItem={({ item, index }) => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => {
+                          navigation.navigate("ArticlesDetail", item);
+                        }}
+                        style={styles.buttonDetail}
+                      >
+                        <View style={{ width: "35%" }}>
+                          <Image
                             style={{
-                              flexDirection: "row",
-                              width: "65%",
+                              width: "90%",
+                              height: 103,
+                              borderRadius: 15,
+                              backgroundColor: "#cccccc",
                             }}
-                          >
-                            <View style={{ width: "100%" }}>
+                            source={{
+                              uri:
+                                "http://144.126.242.196:5000/api/image/getimage/" +
+                                item.image_url,
+                            }}
+                          />
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            width: "65%",
+                          }}
+                        >
+                          <View style={{ width: "100%" }}>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Text style={styles.textDetail}>● Coffee</Text>
                               <View
                                 style={{
+                                  justifyContent: "center",
                                   flexDirection: "row",
-                                  justifyContent: "space-between",
                                 }}
                               >
-                                <Text style={styles.textDetail}>● Coffee</Text>
-                                <View
-                                  style={{
-                                    justifyContent: "center",
-                                    flexDirection: "row",
-                                  }}
+                                <Text
+                                  style={[styles.textPopular, { fontSize: 10 }]}
                                 >
-                                  <Text
-                                    style={[
-                                      styles.textPopular,
-                                      { fontSize: 10 },
-                                    ]}
-                                  >
-                                    {item.like_models.length}
-                                  </Text>
-                                  <EvilIcons
-                                    name="like"
-                                    size={18}
-                                    color="black"
-                                  />
-                                </View>
+                                  {item.like_models.length}
+                                </Text>
+                                <EvilIcons
+                                  name="like"
+                                  size={18}
+                                  color="black"
+                                />
                               </View>
-                              <Text
-                                numberOfLines={2}
-                                style={[styles.textDetail, { fontSize: 16 }]}
-                              >
-                                {item.title}
-                              </Text>
+                            </View>
+                            <Text
+                              numberOfLines={2}
+                              style={[styles.textDetail, { fontSize: 16 }]}
+                            >
+                              {item.title}
+                            </Text>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                marginTop: 8,
+                              }}
+                            >
                               <View
                                 style={{
                                   flexDirection: "row",
-                                  marginTop: 8,
+                                  alignItems: "center",
                                 }}
                               >
-                                <View
-                                  style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                  }}
+                                <MaterialCommunityIcons
+                                  name="face-outline"
+                                  size={20}
+                                  color="#484848"
+                                />
+                                <Text
+                                  numberOfLines={1}
+                                  style={[styles.textPopular, { width: 90 }]}
                                 >
-                                  <MaterialCommunityIcons
-                                    name="face-outline"
-                                    size={20}
-                                    color="#484848"
-                                  />
-                                  <Text
-                                    numberOfLines={1}
-                                    style={[styles.textPopular, { width: 90 }]}
-                                  >
-                                    {" "}
-                                    {item.user_model.first_name +
-                                      " " +
-                                      item.user_model.last_name}
-                                  </Text>
-                                </View>
-                                <View
-                                  style={[
-                                    styles.viewComment,
-                                    {
-                                      marginLeft: 10,
-                                    },
-                                  ]}
-                                >
-                                  <Image
-                                    style={{ width: 18, height: 18 }}
-                                    source={require("../../img/chat.png")}
-                                  />
-                                  <Text style={styles.textPopular}>
-                                    {" "}
-                                    {item.comment_model.length} comments
-                                  </Text>
-                                </View>
+                                  {" "}
+                                  {item.user_model.first_name +
+                                    " " +
+                                    item.user_model.last_name}
+                                </Text>
+                              </View>
+                              <View
+                                style={[
+                                  styles.viewComment,
+                                  {
+                                    marginLeft: 10,
+                                  },
+                                ]}
+                              >
+                                <Image
+                                  style={{ width: 18, height: 18 }}
+                                  source={require("../../img/chat.png")}
+                                />
+                                <Text style={styles.textPopular}>
+                                  {" "}
+                                  {item.comment_model.length} comments
+                                </Text>
                               </View>
                             </View>
                           </View>
-                        </TouchableOpacity>
-                      </View>
-                    )
-                  );
-                }}
-              />
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
+              </View>
             </View>
           )}
           {page == 2 && (
@@ -453,7 +465,7 @@ export default function Articles({ navigation }) {
                               }}
                               source={{
                                 uri:
-                                  "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                                  "http://144.126.242.196:5000/api/image/getimage/" +
                                   item.image_url,
                               }}
                             />
@@ -712,6 +724,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     justifyContent: "center",
     borderBottomWidth: 0.2,
+    zIndex: 999,
   },
   viewFillter: {
     width: 91,

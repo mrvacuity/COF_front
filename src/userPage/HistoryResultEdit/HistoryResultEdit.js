@@ -55,7 +55,7 @@ export default function HistoryResultEdit({ navigation, route }) {
             style={{ width: "100%", height: 353, marginBottom: 10 }}
             source={{
               uri:
-                "https://api-cof.wishesexistence.co/api/image/getimage/" +
+                "http://144.126.242.196:5000/api/image/getimage/" +
                 route?.params?.image_url?.replace(".png", ""),
             }}
           />
