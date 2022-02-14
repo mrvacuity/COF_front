@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -69,6 +70,8 @@ export default function Post({ navigation, route }) {
       if (!comment) {
         Alert.alert("Error");
       }
+    } else {
+      Alert.alert("Please complete the information !");
     }
   }
 
@@ -123,7 +126,6 @@ export default function Post({ navigation, route }) {
     } else {
     }
   };
-
   return (
     <View style={styles.container}>
       <SafeAreaView />

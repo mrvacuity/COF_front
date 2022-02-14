@@ -40,16 +40,16 @@ export default function Test({ navigation, route }) {
     getTest();
   }, []);
   async function send() {
-    let data = {
-      ...state,
-      score: (
-        (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
-        100
-      ).toFixed(),
-    };
+    // let data = {
+    //   ...state,
+    //   score: (
+    //     (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
+    //     100
+    //   ).toFixed(),
+    // };
     if (ans.length == quiz.length) {
       const send = await authActionScore({
-        state: data,
+        state,
         token: token.accessToken,
       });
       if (send) {
@@ -136,6 +136,8 @@ export default function Test({ navigation, route }) {
                                   : "rgba(202, 164, 159, 0.19)"
                                 : indexs == item.answer
                                 ? "rgba(174, 195, 160, 0.19)"
+                                : status && data == item.answer
+                                ? "rgba(174, 195, 160, 0.19)"
                                 : "#f0e9e4",
                           },
                         ]}
@@ -166,6 +168,14 @@ export default function Test({ navigation, route }) {
                               })
                             );
                           }
+                          setState({
+                            ...state,
+                            score: (
+                              (ans.filter((e) => e.myAns == e.Answer).length /
+                                quiz.length) *
+                              100
+                            ).toFixed(),
+                          });
                         }}
                       >
                         <FontAwesome

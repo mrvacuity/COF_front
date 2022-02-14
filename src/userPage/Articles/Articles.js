@@ -347,6 +347,7 @@ export default function Articles({ navigation }) {
                           style={{
                             flexDirection: "row",
                             width: "65%",
+                            paddingHorizontal: 10,
                           }}
                         >
                           <View style={{ width: "100%" }}>

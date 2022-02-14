@@ -40,21 +40,20 @@ export default function Pretest({ navigation, route }) {
   }, []);
   async function send() {
     if (ans.length == quiz.length) {
-      setstate({
-        ...state,
-        score: (
-          (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
-          100
-        ).toFixed(),
+      // setstate({
+      //   ...state,
+      //   score: (
+      //     (ans.filter((e) => e.myAns == e.Answer).length / quiz.length) *
+      //     100
+      //   ).toFixed(),
+      // });
+      // console.log(state);
+      const send = await authActionScore({
+        state,
+        token: token.accessToken,
       });
-      if (state.score != "") {
-        const send = await authActionScore({
-          state,
-          token: token.accessToken,
-        });
-        if (send) {
-          navigation.navigate("Lesson", route.params);
-        }
+      if (send) {
+        navigation.navigate("Lesson", route.params);
       }
     } else {
       Alert.alert("Please answer all of the following questions.");
@@ -96,7 +95,7 @@ export default function Pretest({ navigation, route }) {
       <SafeAreaView />
       <View style={{ marginTop: Platform.OS === "ios" ? 0 : 30 }} />
       <View style={[styles.viewDetail]}>
-        <View style={{ height: height * 0.75 }}>
+        <View style={{ height: height * 0.8 }}>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
@@ -137,6 +136,15 @@ export default function Pretest({ navigation, route }) {
                             Answer: item.answer,
                           })
                         );
+                        //.......................
+                        setstate({
+                          ...state,
+                          score: (
+                            (ans.filter((e) => e.myAns == e.Answer).length /
+                              quiz.length) *
+                            100
+                          ).toFixed(),
+                        });
                       }}
                     >
                       <FontAwesome
@@ -166,7 +174,7 @@ export default function Pretest({ navigation, route }) {
             }}
           />
         </View>
-        <View style={{ height: height * 0.06 }}>
+        <View style={{ height: height * 0.06, justifyContent: "center" }}>
           <TouchableOpacity onPress={send} style={styles.buttonDone}>
             <Text
               style={{ fontSize: 18, fontFamily: "Roboto", color: "#484848" }}
@@ -187,7 +195,7 @@ const styles = StyleSheet.create({
   },
   viewDetail: {
     width: "100%",
-    height: "90%",
+    height: "100%",
     backgroundColor: "#f0e9e4",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
