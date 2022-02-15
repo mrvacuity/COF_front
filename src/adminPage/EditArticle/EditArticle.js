@@ -103,7 +103,13 @@ export default function EditArticle({ navigation }) {
                   />
                 </View>
                 <View style={styles.viewtextDetail}>
-                  <View style={{ width: "100%", paddingVertical: 10 }}>
+                  <View
+                    style={{
+                      width: "100%",
+                      paddingVertical: 10,
+                      paddingLeft: 10,
+                    }}
+                  >
                     <View
                       style={{
                         flexDirection: "row",
