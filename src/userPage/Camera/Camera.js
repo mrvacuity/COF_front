@@ -59,7 +59,6 @@ export default function Camara({ navigation }) {
     let type = match ? `image/${match[1]}` : `image`;
     // let formData = new FormData();
     setimageTODO({ uri: localUri, name: filename, type });
-    // formData.append("file", { uri: localUri, name: filename, type });
 
     const base64upload = await apiservice({
       path: "/image/create",
@@ -242,7 +241,6 @@ export default function Camara({ navigation }) {
                   setResult(true);
                   let formData = new FormData();
                   formData.append("file", imageTODO);
-
                   const res = await axios.post(
                     "https://getprediction-eb7wj7y6sa-as.a.run.app",
                     formData,

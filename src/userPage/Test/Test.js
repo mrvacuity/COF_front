@@ -34,7 +34,6 @@ export default function Test({ navigation, route }) {
     lesson_id: route.params.id,
     score: "",
   });
-
   const [status, setStatus] = useState(false);
   useEffect(() => {
     getTest();
@@ -135,7 +134,7 @@ export default function Test({ navigation, route }) {
                                   ? "rgba(174, 195, 160, 0.19)"
                                   : "rgba(202, 164, 159, 0.19)"
                                 : indexs == item.answer
-                                ? "rgba(174, 195, 160, 0.19)"
+                                ? "#f0e9e4"
                                 : status && data == item.answer
                                 ? "rgba(174, 195, 160, 0.19)"
                                 : "#f0e9e4",
