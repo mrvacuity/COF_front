@@ -262,3 +262,20 @@ export async function authActionCreateComponent({ state, token }) {
     throw error;
   }
 }
+export async function authActionForgetPassword({ state }) {
+  try {
+    const response = await apiservice({
+      path: "/authen/forgetpassword",
+      method: "post",
+      body: state,
+    });
+    if (response.status == 200) {
+      return response.data;
+    } else {
+      console.log(response);
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+}

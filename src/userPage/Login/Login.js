@@ -35,6 +35,7 @@ import {
 import { apiservice } from "../../service/api";
 import { Authen, tokenState } from "../../recoil/recoil";
 import { useRecoilState } from "recoil";
+import { authActionForgetPassword } from "../../action/authAction";
 
 function Input({
   feather,
@@ -100,6 +101,11 @@ export default function Login({ navigation }) {
   const [auth, setAuth] = useState(useRecoilState(Authen));
   const [modalVisible, setModalVisible] = useState(false);
   const [warningLogin, setWarningLogin] = useState(false);
+  const [warningotp, setWarningotp] = useState(false);
+  const [warningnewpassword, setWarningnewpassword] = useState(false);
+  const [otp, setotp] = useState("");
+  const [mainotp, setMainOtp] = useState();
+  const [newpassword, setnewpassword] = useState("");
   const week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const months = [
@@ -118,6 +124,13 @@ export default function Login({ navigation }) {
   ];
   const [day, setday] = useState(moment().format("LLLL"));
   const [showDate, setShowDate] = useState("");
+  const [stateforget, setstateForget] = useState({
+    email: "",
+  });
+  const [stateReset, setstateReset] = useState({
+    email: "",
+    newpassword: "",
+  });
   const [regisBody, setRegisBody] = useState({
     username: "",
     password: "",
@@ -189,6 +202,24 @@ export default function Login({ navigation }) {
     } else {
     }
   };
+
+  async function forgetpassword() {
+    const reset = await authActionForgetPassword({ state: stateforget });
+    if (reset) {
+      setMainOtp(reset.otp);
+      setPage(5);
+    }
+  }
+  async function reset() {
+    if (stateReset.newpassword == newpassword) {
+      const reset = await authActionForgetPassword({ state: stateReset });
+      if (reset) {
+        setPage(0);
+      }
+    } else {
+      setWarningnewpassword(true);
+    }
+  }
   const login = async () => {
     if (loginBody.username.length > 0 && loginBody.password.length > 0) {
       const res = await apiservice({
@@ -236,6 +267,7 @@ export default function Login({ navigation }) {
 
       if (res.status == 200) {
         Alert.alert("Register success!");
+        setImage(null);
         setRegisBody({
           username: "",
           password: "",
@@ -484,6 +516,7 @@ export default function Login({ navigation }) {
                   )}
                   <TouchableOpacity
                     onPress={() => {
+                      setLoginBody({ username: "", password: "" });
                       setPage(3);
                     }}
                     style={{ marginTop: 4, alignSelf: "flex-end" }}
@@ -505,6 +538,7 @@ export default function Login({ navigation }) {
                 <LoginSocial />
                 <TouchableOpacity
                   onPress={() => {
+                    setLoginBody({ username: "", password: "" });
                     setPage(2);
                   }}
                   style={{ marginTop: 12 }}
@@ -679,6 +713,7 @@ export default function Login({ navigation }) {
                   </View>
                   <TouchableOpacity
                     onPress={() => {
+                      setImage(null);
                       setRegisBody({
                         username: "",
                         password: "",
@@ -718,9 +753,19 @@ export default function Login({ navigation }) {
                 >
                   We will email you a link to reset you password
                 </Text>
-                <Input email placeholder={"Enter Email Address"} />
+                <Input
+                  onChangeText={(text) => {
+                    setstateForget({ ...stateforget, email: text });
+                    setstateReset({ ...stateReset, email: text });
+                  }}
+                  email
+                  placeholder={"Enter Email Address"}
+                />
 
-                <TouchableOpacity style={styles.buttonSuccess}>
+                <TouchableOpacity
+                  onPress={forgetpassword}
+                  style={styles.buttonSuccess}
+                >
                   <Text style={styles.textButton}>Send</Text>
                 </TouchableOpacity>
 
@@ -733,20 +778,97 @@ export default function Login({ navigation }) {
                   <Text style={[styles.text14, { fontSize: 11 }]}>Back</Text>
                 </TouchableOpacity>
               </View>
-            ) : (
-              page == 4 && (
-                <View style={{ alignItems: "center" }}>
-                  <Text style={[styles.textTitle, { marginBottom: 8 }]}>
-                    New Password
-                  </Text>
-                  <Input feather={"lock"} placeholder={"New Password"} />
+            ) : page == 4 ? (
+              <View style={{ alignItems: "center" }}>
+                <Text style={[styles.textTitle, { marginBottom: 8 }]}>
+                  New Password
+                </Text>
+                <View>
                   <Input
+                    secureTextEntry
+                    onChangeText={(text) => {
+                      setstateReset({ ...stateReset, newpassword: text });
+                    }}
+                    feather={"lock"}
+                    placeholder={"New Password"}
+                  />
+                  <Input
+                    secureTextEntry
+                    onChangeText={(text) => {
+                      setnewpassword(text);
+                    }}
                     feather={"lock"}
                     placeholder={"Confirm New Password"}
                   />
+                  {warningnewpassword && (
+                    <Text
+                      style={[
+                        styles.warningLogin,
+                        {
+                          alignSelf: "flex-start",
+                        },
+                      ]}
+                    >
+                      The password Mismatch.
+                    </Text>
+                  )}
+                </View>
+                <TouchableOpacity onPress={reset} style={styles.buttonSuccess}>
+                  <Text style={styles.textButton}>Confirm</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              page == 5 && (
+                <View style={{ alignItems: "center" }}>
+                  <Text style={[styles.textTitle, { marginBottom: 8 }]}>
+                    OTP
+                  </Text>
+                  <Text
+                    style={[
+                      styles.text14,
+                      {
+                        fontSize: 10,
+                        marginTop: 8,
+                        fontFamily: "RobotoLight",
+                        alignSelf: "flex-start",
+                      },
+                    ]}
+                  >
+                    A message OTP password sent, please specify is displayed.
+                    Check your email. You must have received an email with the
+                    OTP. Specify the OTP in Password
+                  </Text>
+                  <View>
+                    <Input
+                      onChangeText={(text) => {
+                        if (otp != "") {
+                          setWarningotp(false);
+                        }
+                        setotp(text);
+                      }}
+                      feather={"lock"}
+                      placeholder={"Enter OTP"}
+                    />
+                    {warningotp && (
+                      <Text
+                        style={[
+                          styles.warningLogin,
+                          {
+                            alignSelf: "flex-start",
+                          },
+                        ]}
+                      >
+                        The OTP Authentication Code Mismatch.
+                      </Text>
+                    )}
+                  </View>
                   <TouchableOpacity
                     onPress={() => {
-                      setPage(1);
+                      if (mainotp == otp) {
+                        setPage(4);
+                      } else {
+                        setWarningotp(true);
+                      }
                     }}
                     style={styles.buttonSuccess}
                   >
