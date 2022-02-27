@@ -33,7 +33,7 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 import { apiservice } from "../../service/api";
-import { Authen, tokenState } from "../../recoil/recoil";
+import { Authen, pagestate, tokenState } from "../../recoil/recoil";
 import { useRecoilState } from "recoil";
 import { authActionForgetPassword } from "../../action/authAction";
 
@@ -91,7 +91,7 @@ function Input({
 }
 
 export default function Login({ navigation }) {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useRecoilState(pagestate);
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);

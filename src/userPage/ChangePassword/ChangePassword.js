@@ -24,9 +24,10 @@ import {
 import { apiservice } from "../../service/api";
 import { authActionResetPassword } from "../../action/authAction";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { tokenState } from "../../recoil/recoil";
+import { pagestate, tokenState } from "../../recoil/recoil";
 const { width, height } = Dimensions.get("screen");
 export default function ChangePassword({ navigation }) {
+  const [page, setPage] = useRecoilState(pagestate);
   const [modalVisible, setModalVisible] = useState(false);
   const [token, setToken] = useRecoilState(tokenState);
   const [modalVisible1, setModalVisible1] = useState(false);
@@ -149,16 +150,24 @@ export default function ChangePassword({ navigation }) {
         >
           <Text style={styles.textButton}>Cancel</Text>
         </TouchableOpacity>
-        <Text
-          style={{
-            fontSize: 13,
-            fontFamily: "RobotoBold",
-            color: "#484848",
-            alignSelf: "center",
+        <TouchableOpacity
+          onPress={() => {
+            setToken("");
+            setPage(3);
+            navigation.navigate("Login");
           }}
         >
-          Forgot password?
-        </Text>
+          <Text
+            style={{
+              fontSize: 13,
+              fontFamily: "RobotoBold",
+              color: "#484848",
+              alignSelf: "center",
+            }}
+          >
+            Forgot password?
+          </Text>
+        </TouchableOpacity>
       </View>
       <Modal
         animationType="slide"

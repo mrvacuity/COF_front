@@ -24,6 +24,10 @@ export const totalsstate = atom({
   key: "totalsstate", // unique ID (with respect to other atoms/selectors)
   default: 0, // default value (aka initial value)
 });
+export const pagestate = atom({
+  key: "pagestate", // unique ID (with respect to other atoms/selectors)
+  default: 0, // default value (aka initial value)
+});
 export const Authen = atom({
   key: "auth",
   default: {
