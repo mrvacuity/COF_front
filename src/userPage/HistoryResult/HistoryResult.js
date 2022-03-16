@@ -74,7 +74,9 @@ export default function HistoryResult({ navigation }) {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("HistoryResultEdit", item);
+                  setTimeout(() => {
+                    navigation.navigate("HistoryResultEdit", item);
+                  }, 500);
                 }}
                 style={styles.list}
               >

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,8 @@ import {
   Entypo,
   FontAwesome,
   MaterialIcons,
+  FontAwesome5,
+  Ionicons,
 } from "@expo/vector-icons";
 import moment from "moment";
 import { apiservice } from "../../service/api";
@@ -26,7 +28,61 @@ const { width, height } = Dimensions.get("screen");
 export default function HistoryResultEdit({ navigation, route }) {
   const [description, setdescription] = useState(route?.params?.description);
   const token = useRecoilValue(tokenState);
-
+  const [data, setdata] = useState(parseFloat(route?.params?.Sour)?.toFixed(2));
+  const [edit, setedit] = useState(false);
+  const [select, setSelect] = useState("Arabica");
+  const [species, setspecies] = useState(false);
+  const [result, setresult] = useState();
+  useEffect(() => {
+    if (data > 0 && data < 1) {
+      setresult(0);
+    } else if (data >= 1 && data < 1.5) {
+      setresult(1);
+    } else if (data >= 1.5 && data < 2.5) {
+      setresult(2);
+    } else if (data >= 2.5 && data < 3.5) {
+      setresult(3);
+    } else if (data >= 3.5 && data < 4.5) {
+      setresult(4);
+    } else if (data >= 4.5 && data < 5.5) {
+      setresult(5);
+    } else if (data >= 5.5 && data < 6.5) {
+      setresult(6);
+    } else if (data >= 6.5 && data < 7.5) {
+      setresult(7);
+    } else if (data >= 7.5 && data < 8.5) {
+      setresult(8);
+    } else if (data >= 8.5 && data < 9.5) {
+      setresult(9);
+    } else if (data >= 9.5 && data < 10.5) {
+      setresult(10);
+    } else if (data >= 10.5 && data < 11.5) {
+      setresult(11);
+    } else if (data >= 11.5 && data < 12.5) {
+      setresult(12);
+    } else if (data >= 12.5 && data < 13.5) {
+      setresult(13);
+    } else if (data >= 13.5 && data < 14.5) {
+      setresult(14);
+    }
+  }, []);
+  const color = [
+    "#771714",
+    "#982c2b",
+    "#bf3333",
+    "#dc4a33",
+    "#ec9e3f",
+    "#f6cd47",
+    "#f2ea52",
+    "#a2c654",
+    "#4f9969",
+    "#3e6998",
+    "#2c3487",
+    "#8e3c64",
+    "#863289",
+    "#74317b",
+    "#5c2765",
+  ];
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -48,7 +104,7 @@ export default function HistoryResultEdit({ navigation, route }) {
             >
               <Entypo name="chevron-thin-left" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.textTitle}>History Result</Text>
+            <Text style={styles.textTitle}>Cof Memo</Text>
             <Text style={{ width: "10%" }}></Text>
           </View>
           <Image
@@ -61,7 +117,9 @@ export default function HistoryResultEdit({ navigation, route }) {
           />
           <View style={{ paddingHorizontal: 24 }}>
             <View style={styles.viewTopic}>
-              <Text style={styles.textSuject}>Result</Text>
+              <Text style={styles.textSuject}>
+                Result: <Text style={styles.textSujectLight}>Dark Roast</Text>
+              </Text>
               <Text style={styles.textDate}>
                 Date : {moment(route?.params?.createdAt).format("DD/MM/YYYY")}{" "}
                 Time : {moment(route?.params?.createdAt).format("HH:mm")}
@@ -73,6 +131,266 @@ export default function HistoryResultEdit({ navigation, route }) {
                 pH{parseFloat(route?.params?.Sour)?.toFixed(2)}
               </Text>
             </View>
+            <View
+              style={{ width: "100%", flexDirection: "row", marginTop: 20 }}
+            >
+              {color.map((item, index) => {
+                return (
+                  <View style={{ alignItems: "center" }}>
+                    <Text
+                      style={
+                        index == data
+                          ? [styles.textSuject, { fontSize: 11 }]
+                          : [styles.textSujectLight, { fontSize: 11 }]
+                      }
+                    >
+                      {index}
+                    </Text>
+                    <View
+                      style={{
+                        borderWidth: index == result ? 3 : 0,
+                        borderColor: "#484848",
+                        backgroundColor: item,
+                        width: width * 0.055,
+                        height: width * 0.055,
+                      }}
+                    />
+                  </View>
+                );
+              })}
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={styles.textSujectLight}>Brand : </Text>
+                <TextInput
+                  editable={!edit ? false : true}
+                  defaultValue="Doi Chaang"
+                  style={{
+                    width: edit ? "82%" : "80%",
+                    borderRadius: 5,
+                    height: 29,
+                    backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
+                    paddingHorizontal: 10,
+                    fontSize: 18,
+                    fontFamily: "RobotoLight",
+                    color: "#484848",
+                  }}
+                />
+              </View>
+              {!edit && (
+                <TouchableOpacity
+                  onPress={() => {
+                    // setedit(true);
+                  }}
+                >
+                  <FontAwesome5 name="edit" size={14} color="#484848" />
+                </TouchableOpacity>
+              )}
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 20,
+              }}
+            >
+              <Text style={styles.textSujectLight}>Coffee species : </Text>
+              <View style={{}}>
+                <TouchableOpacity
+                  disabled={!edit ? true : false}
+                  onPress={() => {
+                    setspecies((val) => !val);
+                  }}
+                  style={{
+                    width: edit ? width * 0.5 : width * 0.5,
+                    borderRadius: 5,
+                    height: 29,
+                    backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
+                    paddingHorizontal: 10,
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    borderBottomLeftRadius: species ? 0 : 5,
+                    borderBottomRightRadius: species ? 0 : 5,
+                  }}
+                >
+                  <Text style={styles.textSujectLight}>{select}</Text>
+                  {edit && (
+                    <Ionicons
+                      name="ios-caret-down-outline"
+                      size={20}
+                      color="#484848"
+                    />
+                  )}
+                </TouchableOpacity>
+                {species && (
+                  <View
+                    style={{
+                      width: "66%",
+                      backgroundColor: "#FFFFFF",
+                      position: "absolute",
+                      marginTop: 29,
+
+                      borderWidth: 1,
+                      borderColor: "#eee",
+                      zIndex: 99,
+                    }}
+                  >
+                    <FlatList
+                      numColumns={1}
+                      style={{}}
+                      data={["Arabica", "Robusta", "Excelsa", "Liberica"]}
+                      renderItem={({ item, index }) => {
+                        return (
+                          <TouchableOpacity
+                            onPress={() => {
+                              setSelect(item);
+                              setspecies(false);
+                            }}
+                            style={{
+                              height: 29,
+                              borderTopWidth: 1,
+                              paddingHorizontal: 10,
+                              borderColor: "#eee",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Text style={styles.textSujectLight}>{item}</Text>
+                          </TouchableOpacity>
+                        );
+                      }}
+                    />
+                  </View>
+                )}
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 20,
+                zIndex: -1,
+              }}
+            >
+              <Text style={styles.textSujectLight}>Source : </Text>
+              <TextInput
+                editable={!edit ? false : true}
+                defaultValue="Thailand"
+                style={{
+                  width: edit ? "78%" : "78%",
+                  borderRadius: 5,
+                  height: 29,
+                  backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
+                  paddingHorizontal: 10,
+                  fontSize: 18,
+                  fontFamily: "RobotoLight",
+                  color: "#484848",
+                }}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 20,
+                zIndex: -1,
+              }}
+            >
+              <Text style={styles.textSujectLight}>Quantity : </Text>
+              <TextInput
+                editable={!edit ? false : true}
+                defaultValue="5 gram"
+                style={{
+                  width: edit ? "75%" : "75%",
+                  borderRadius: 5,
+                  height: 29,
+                  backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
+                  paddingHorizontal: 10,
+                  fontSize: 18,
+                  fontFamily: "RobotoLight",
+                  color: "#484848",
+                }}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 20,
+                zIndex: -1,
+              }}
+            >
+              <Text style={styles.textSujectLight}>Temperature : </Text>
+              <TextInput
+                editable={!edit ? false : true}
+                defaultValue="120"
+                style={{
+                  width: edit ? "18%" : "18%",
+                  borderRadius: 5,
+                  height: 29,
+                  backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
+                  paddingHorizontal: 10,
+                  fontSize: 18,
+                  fontFamily: "RobotoLight",
+                  color: "#484848",
+                }}
+              />
+              <Text style={styles.textSujectLight}>°C</Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 20,
+              }}
+            >
+              <Text style={styles.textSujectLight}>Time : </Text>
+              <TextInput
+                editable={!edit ? false : true}
+                keyboardType="numeric"
+                maxLength={2}
+                defaultValue="05"
+                style={{
+                  width: edit ? "12%" : "12%",
+                  borderRadius: 5,
+                  height: 29,
+                  backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
+                  paddingHorizontal: 10,
+                  fontSize: 18,
+                  fontFamily: "RobotoLight",
+                  color: "#484848",
+                }}
+              />
+              <Text style={[styles.textSujectLight, { marginHorizontal: 5 }]}>
+                :
+              </Text>
+              <TextInput
+                editable={!edit ? false : true}
+                keyboardType="numeric"
+                maxLength={2}
+                defaultValue="50"
+                style={{
+                  width: edit ? "12%" : "12%",
+                  borderRadius: 5,
+                  height: 29,
+                  backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
+                  paddingHorizontal: 10,
+                  fontSize: 18,
+                  fontFamily: "RobotoLight",
+                  color: "#484848",
+                }}
+              />
+              <Text style={styles.textSujectLight}>min</Text>
+            </View>
             {/* <View style={styles.viewTopic}>
               <Text style={styles.textSujectLight}>Sweetness</Text>
               <Text style={styles.textSujectLight}>20 brix</Text>
@@ -83,40 +401,51 @@ export default function HistoryResultEdit({ navigation, route }) {
               </Text>
               <Text style={styles.textSujectLight}>40 ppm</Text>
             </View> */}
-            <Text style={[styles.textSuject, { color: "#000", marginTop: 34 }]}>
-              Description
+            <Text
+              style={[styles.textSujectLight, { color: "#000", marginTop: 34 }]}
+            >
+              Note :
             </Text>
             <TextInput
-              defaultValue={description}
+              editable={!edit ? false : true}
+              defaultValue={
+                "This is my first roast. I use it to make ice espresso. On the tip of the tongue, there is a mellow bitter taste."
+              }
               onChangeText={setdescription}
               placeholder="Enter your description"
               placeholderTextColor={"#484848"}
               multiline
-              style={[styles.textSuject, styles.input]}
+              style={[
+                styles.textSujectLight,
+                styles.input,
+                { backgroundColor: edit ? "#FFFFFF" : "#f0e9e4" },
+              ]}
             />
-            <TouchableOpacity
-              onPress={async () => {
-                const res = await apiservice({
-                  path: "/lesson/updatehistory",
-                  method: "put",
-                  body: {
-                    ...route.params,
-                    description,
-                  },
-                  token: token.accessToken,
-                });
+            {edit && (
+              <TouchableOpacity
+                onPress={async () => {
+                  const res = await apiservice({
+                    path: "/lesson/updatehistory",
+                    method: "put",
+                    body: {
+                      ...route.params,
+                      description,
+                    },
+                    token: token.accessToken,
+                  });
 
-                if (res.status == 200) {
-                  Alert.alert("Update success");
-                  navigation.goBack();
-                }
-              }}
-              style={styles.button}
-            >
-              <Text style={[styles.textSujectLight, { fontSize: 14 }]}>
-                Save
-              </Text>
-            </TouchableOpacity>
+                  if (res.status == 200) {
+                    Alert.alert("Update success");
+                    navigation.goBack();
+                  }
+                }}
+                style={styles.button}
+              >
+                <Text style={[styles.textSujectLight, { fontSize: 14 }]}>
+                  Save
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>

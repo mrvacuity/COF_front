@@ -16,6 +16,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { tokenState } from "../../recoil/recoil";
 import { apiservice } from "../../service/api";
 import { useIsFocused } from "@react-navigation/native";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("screen");
 export default function Home({ navigation }) {
   const [token, setToken] = useRecoilState(tokenState);
@@ -92,17 +93,41 @@ export default function Home({ navigation }) {
         >
           <View style={[styles.viewDetail]}>
             <View style={{ paddingHorizontal: 29 }}>
-              <Text
-                style={[styles.textBold, { fontSize: 18, alignSelf: "center" }]}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
               >
-                HOME
-              </Text>
+                <TouchableOpacity onPress={() => {}} style={{ width: "10%" }}>
+                  <MaterialCommunityIcons
+                    name="alert-circle-outline"
+                    size={24}
+                    color="black"
+                  />
+                </TouchableOpacity>
+                <Text style={[styles.textBold, { fontSize: 18 }]}>Home</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("HistoryResult");
+                  }}
+                  style={{ width: "10%" }}
+                >
+                  <MaterialCommunityIcons
+                    name="clock-time-four-outline"
+                    size={24}
+                    color="black"
+                  />
+                </TouchableOpacity>
+              </View>
               <Text
                 style={[styles.textRegular, { marginTop: 35, marginBottom: 8 }]}
               >
                 {"Welcome back, " + userData.first_name + "!"}
               </Text>
-              <Text style={styles.textLight}>Have you drunk yet?</Text>
+              <Text style={styles.textLight}>
+                Good Ideas Start With Great Coffee
+              </Text>
               <Text style={[styles.textBold, { fontSize: 18, marginTop: 12 }]}>
                 Lesson
               </Text>
@@ -124,27 +149,26 @@ export default function Home({ navigation }) {
                     <View style={{ width: "65%" }}>
                       <Text style={styles.textRegular}>{item.title}</Text>
 
-                      <FlatList
-                        numColumns={1}
-                        style={{ marginLeft: 10, marginVertical: 12 }}
-                        data={item.lesson}
-                        renderItem={({ item, index }) => {
-                          return (
-                            <View>
-                              <Unorderedlist>
-                                <Text
-                                  style={[
-                                    styles.textLight,
-                                    { fontSize: 13, color: "#484848" },
-                                  ]}
-                                >
-                                  {item.title}
-                                </Text>
-                              </Unorderedlist>
-                            </View>
-                          );
-                        }}
-                      />
+                      <Text
+                        style={[
+                          styles.textLight,
+                          {
+                            fontSize: 13,
+                            color: "#484848",
+                            marginVertical: 12,
+                          },
+                        ]}
+                      >
+                        {item.title == "Plant"
+                          ? "Learn about the origin and characteristics of different types of the coffee tree including Arabica, Robusta, Excelsa, and Liberica."
+                          : item.title == "Harvest"
+                          ? "Learn how coffee beans are harvested and processed before they are ready to be roasted."
+                          : item.title == "Roasting"
+                          ? "Learn about the origin of coffee roasting and the different method of the coffee roasting process such as Light Roast, Medium Roast, and Dark Roast."
+                          : item.title == "Brew"
+                          ? "Leaning about methods of brewing your favorite coffee including how to make a cold brew or an espresso."
+                          : ""}
+                      </Text>
 
                       <Text
                         style={[
