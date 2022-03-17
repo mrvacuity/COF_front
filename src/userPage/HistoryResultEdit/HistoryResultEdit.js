@@ -111,7 +111,7 @@ export default function HistoryResultEdit({ navigation, route }) {
             style={{ width: "100%", height: 353, marginBottom: 10 }}
             source={{
               uri:
-                "http://144.126.242.196:5000/api/image/getimage/" +
+                "http://165.22.251.6:5000/api/image/getimage/" +
                 route?.params?.image_url?.replace(".png", ""),
             }}
           />
@@ -172,7 +172,7 @@ export default function HistoryResultEdit({ navigation, route }) {
                 <Text style={styles.textSujectLight}>Brand : </Text>
                 <TextInput
                   editable={!edit ? false : true}
-                  defaultValue="Doi Chaang"
+                  defaultValue="Test"
                   style={{
                     width: edit ? "82%" : "80%",
                     borderRadius: 5,
@@ -332,7 +332,7 @@ export default function HistoryResultEdit({ navigation, route }) {
               <Text style={styles.textSujectLight}>Temperature : </Text>
               <TextInput
                 editable={!edit ? false : true}
-                defaultValue="120"
+                defaultValue="5"
                 style={{
                   width: edit ? "18%" : "18%",
                   borderRadius: 5,
@@ -357,8 +357,8 @@ export default function HistoryResultEdit({ navigation, route }) {
               <TextInput
                 editable={!edit ? false : true}
                 keyboardType="numeric"
-                maxLength={2}
-                defaultValue="05"
+                maxLength={3}
+                defaultValue="5"
                 style={{
                   width: edit ? "12%" : "12%",
                   borderRadius: 5,
@@ -377,7 +377,7 @@ export default function HistoryResultEdit({ navigation, route }) {
                 editable={!edit ? false : true}
                 keyboardType="numeric"
                 maxLength={2}
-                defaultValue="50"
+                defaultValue="5"
                 style={{
                   width: edit ? "12%" : "12%",
                   borderRadius: 5,
@@ -409,7 +409,7 @@ export default function HistoryResultEdit({ navigation, route }) {
             <TextInput
               editable={!edit ? false : true}
               defaultValue={
-                "This is my first roast. I use it to make ice espresso. On the tip of the tongue, there is a mellow bitter taste."
+                "hello world"
               }
               onChangeText={setdescription}
               placeholder="Enter your description"

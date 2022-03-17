@@ -1,5 +1,5 @@
 import axios from "axios";
-const BaseUrl = "http://144.126.242.196:5000/api";
+const BaseUrl = "http://165.22.251.6:5000/api";
 //const BaseUrl = "https://api-cof.wishesexistence.co/api";
 
 async function apiservice({ url, method, path, body, token }) {

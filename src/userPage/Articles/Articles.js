@@ -104,6 +104,14 @@ export default function Articles({ navigation }) {
       >
         <View style={[styles.viewDetail]}>
           <View style={styles.viewHeader}>
+            {/* <TouchableOpacity
+              style={{ width: "10%",marginLeft:0, alignItems: "flex-end" }}
+              onPress={() => {
+                navigation.navigate("Favorite");
+              }}
+            >
+              <Ionicons name="alert-circle-outline" size={24} color="black" />
+            </TouchableOpacity> */}
             <Text style={{ width: "10%" }}></Text>
             <Text style={styles.textTitle}>
               {page == 1 ? "Articles" : "Timeline Post"}
@@ -171,14 +179,15 @@ export default function Articles({ navigation }) {
                             source={{
                               uri:
                                 item.image_url != null &&
-                                "http://144.126.242.196:5000/api/image/getimage/" +
-                                  item.image_url,
+                                "http://165.22.251.6:5000/api/image/getimage/" +
+                                item.image_url,
                             }}
                           />
+                          <Text style={styles.textsubjectPopular}>
+                            {item.title}
+                          </Text>
                         </TouchableOpacity>
-                        <Text style={styles.textsubjectPopular}>
-                          {item.title}
-                        </Text>
+
                         <View style={{ flexDirection: "row", marginTop: 8 }}>
                           <View
                             style={{
@@ -293,32 +302,32 @@ export default function Articles({ navigation }) {
               <View style={{ zIndex: -1 }}>
                 <FlatList
                   numColumns={1}
-                  style={{ marginBottom: 40 }}
+                  style={{ marginBottom: 40, borderColor: 'black' }}
                   data={
                     lastest
                       ? data
-                          .filter((item) => {
-                            return item.title.includes(search);
-                          })
-                          .sort((a, b) => b.id - a.id)
+                        .filter((item) => {
+                          return item.title.includes(search);
+                        })
+                        .sort((a, b) => b.id - a.id)
                       : oldest
-                      ? data
+                        ? data
                           .filter((item) => {
                             return item.title.includes(search);
                           })
                           .sort((a, b) => a.id - b.id)
-                      : mostlike
-                      ? data
-                          .filter((item) => {
+                        : mostlike
+                          ? data
+                            .filter((item) => {
+                              return item.title.includes(search);
+                            })
+                            .sort(
+                              (a, b) =>
+                                b.like_models.length - a.like_models.length
+                            )
+                          : data.filter((item) => {
                             return item.title.includes(search);
                           })
-                          .sort(
-                            (a, b) =>
-                              b.like_models.length - a.like_models.length
-                          )
-                      : data.filter((item) => {
-                          return item.title.includes(search);
-                        })
                   }
                   renderItem={({ item, index }) => {
                     return (
@@ -326,7 +335,12 @@ export default function Articles({ navigation }) {
                         onPress={() => {
                           navigation.navigate("ArticlesDetail", item);
                         }}
-                        style={styles.buttonDetail}
+                        style={[styles.buttonDetail,
+                        {
+                          borderRadius: 15,
+                          backgroundColor: "#FBF9F8",
+                          borderColor: "#FBF9F8",
+                        }]}
                       >
                         <View style={{ width: "35%" }}>
                           <Image
@@ -338,7 +352,7 @@ export default function Articles({ navigation }) {
                             }}
                             source={{
                               uri:
-                                "http://144.126.242.196:5000/api/image/getimage/" +
+                                "http://165.22.251.6:5000/api/image/getimage/" +
                                 item.image_url,
                             }}
                           />
@@ -351,7 +365,7 @@ export default function Articles({ navigation }) {
                           }}
                         >
                           <View style={{ width: "100%" }}>
-                            <View
+                            {/* <View
                               style={{
                                 flexDirection: "row",
                                 justifyContent: "space-between",
@@ -375,13 +389,57 @@ export default function Articles({ navigation }) {
                                   color="black"
                                 />
                               </View>
-                            </View>
+                            </View> */}
                             <Text
                               numberOfLines={2}
                               style={[styles.textDetail, { fontSize: 16 }]}
                             >
                               {item.title}
                             </Text>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <View
+                                style={[
+                                  styles.viewComment,
+                                  {
+                                    marginLeft: 0,
+                                  },
+                                ]}
+                              >
+                                <Image
+                                  style={{ width: 18, height: 18 }}
+                                  source={require("../../img/chat.png")}
+                                />
+                                <Text style={styles.textPopular}>
+                                  {" "}
+                                  {item.comment_model.length} comments
+                                </Text>
+                              </View>
+                              <View
+                                style={{
+                                  justifyContent: "center",
+                                  flexDirection: "row",
+                                }}
+                              >
+                                <Text
+                                  style={[styles.textPopular, { fontSize: 10 }]}
+                                >
+                                  {item.like_models.length}
+                                  {" "}
+                                </Text>
+                                <AntDesign name="hearto" size={12} color="#484848" />
+                                {/* <EvilIcons
+                                  name="like"
+                                  size={18}
+                                  color="black"
+                                /> */}
+
+                              </View>
+                            </View>
                             <View
                               style={{
                                 flexDirection: "row",
@@ -407,23 +465,6 @@ export default function Articles({ navigation }) {
                                   {item.user_model.first_name +
                                     " " +
                                     item.user_model.last_name}
-                                </Text>
-                              </View>
-                              <View
-                                style={[
-                                  styles.viewComment,
-                                  {
-                                    marginLeft: 10,
-                                  },
-                                ]}
-                              >
-                                <Image
-                                  style={{ width: 18, height: 18 }}
-                                  source={require("../../img/chat.png")}
-                                />
-                                <Text style={styles.textPopular}>
-                                  {" "}
-                                  {item.comment_model.length} comments
                                 </Text>
                               </View>
                             </View>
@@ -466,7 +507,7 @@ export default function Articles({ navigation }) {
                               }}
                               source={{
                                 uri:
-                                  "http://144.126.242.196:5000/api/image/getimage/" +
+                                  "http://165.22.251.6:5000/api/image/getimage/" +
                                   item.image_url,
                               }}
                             />
@@ -485,14 +526,15 @@ export default function Articles({ navigation }) {
                                   justifyContent: "space-between",
                                 }}
                               >
-                                <Text
+                                <Text style={{ width: "10%" }}></Text>
+                                {/* <Text
                                   style={[
                                     styles.textDetail,
                                     { fontFamily: "RobotoBold" },
                                   ]}
                                 >
                                   ● Coffee
-                                </Text>
+                                </Text> */}
                                 <Text style={styles.textDate1}>
                                   {moment(new Date(item.createdAt)).format(
                                     "DD/MM/YYYY"
@@ -503,7 +545,7 @@ export default function Articles({ navigation }) {
                                 numberOfLines={2}
                                 style={[
                                   styles.textDetail,
-                                  { fontSize: 16, fontFamily: "RobotoLight" },
+                                  { fontSize: 16, fontFamily: "RobotoBold" },
                                 ]}
                               >
                                 {item.title}

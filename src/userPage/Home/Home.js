@@ -11,8 +11,12 @@ import {
   FlatList,
   ScrollView,
 } from "react-native";
+import {
+  Ionicons
+} from "@expo/vector-icons";
 import Unorderedlist from "react-native-unordered-list";
 import { useRecoilState, useRecoilValue } from "recoil";
+import axios from "axios";
 import { tokenState } from "../../recoil/recoil";
 import { apiservice } from "../../service/api";
 import { useIsFocused } from "@react-navigation/native";
@@ -35,9 +39,16 @@ export default function Home({ navigation }) {
   }, [isfocused]);
 
   const getLesson = async () => {
-    const res = await apiservice({
-      path: "/lesson/getalllesson",
+    // const res = await apiservice({
+    //   path: "/lesson/getalllesson",
+    //   method: "get",
+    // });
+    const res = await axios({
       method: "get",
+      url: "http://165.22.251.6:5000/api/lesson/getalllesson",
+      headers: {
+        "Content-Type": "application/json",
+      }
     });
 
     if (res.status == 200) {
@@ -93,30 +104,33 @@ export default function Home({ navigation }) {
         >
           <View style={[styles.viewDetail]}>
             <View style={{ paddingHorizontal: 29 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <TouchableOpacity onPress={() => {}} style={{ width: "10%" }}>
-                  <MaterialCommunityIcons
-                    name="alert-circle-outline"
-                    size={24}
-                    color="black"
-                  />
+              <View style={[styles.viewHeader]}>
+                {/* <Text style={
+                  {width:'10%'}
+                }>
+                </Text> */}
+                <TouchableOpacity
+                  onPress={() => {
+                    // setModalVisible(true);
+                    navigation.navigate("HomeGuide");
+                  }}
+                >
+                  <Ionicons name="alert-circle-outline" size={24} color="black" />
                 </TouchableOpacity>
-                <Text style={[styles.textBold, { fontSize: 18 }]}>Home</Text>
+                <Text
+                  style={[styles.textBold, { fontSize: 18, alignSelf: "center" }]}
+                >
+                  HOME
+                </Text>
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate("HistoryResult");
                   }}
-                  style={{ width: "10%" }}
                 >
                   <MaterialCommunityIcons
                     name="clock-time-four-outline"
-                    size={24}
-                    color="black"
+                    size={26}
+                    color="#484848"
                   />
                 </TouchableOpacity>
               </View>
@@ -144,12 +158,33 @@ export default function Home({ navigation }) {
                     onPress={() => {
                       navigation.navigate("Pretest", item);
                     }}
-                    style={styles.viewHistory}
+                    style={[styles.viewHistory,
+                    {
+                      backgroundColor: "#FBF9F8",
+                      borderRadius: 10,
+                      borderColor: "#FBF9F8",
+                      width: "92%"
+                    }]}
                   >
                     <View style={{ width: "65%" }}>
                       <Text style={styles.textRegular}>{item.title}</Text>
-
-                      <Text
+                      <View style={{
+                        justifyContent: "center",
+                        width: '90%',
+                        // alignSelf: 'center',
+                      }}>
+                        <Text style={[{
+                          textAlign: 'left',
+                          marginTop: 10,
+                          marginBottom: 10,
+                          fontFamily: "Roboto",
+                          fontSize: 12,
+                          color: "#888888",
+                          textAlign: 'justify',
+                        }
+                        ]}>{item.description}</Text>
+                      </View>
+                      {/* <Text
                         style={[
                           styles.textLight,
                           {
@@ -168,7 +203,7 @@ export default function Home({ navigation }) {
                           : item.title == "Brew"
                           ? "Leaning about methods of brewing your favorite coffee including how to make a cold brew or an espresso."
                           : ""}
-                      </Text>
+                      </Text> */}
 
                       <Text
                         style={[
@@ -185,11 +220,11 @@ export default function Home({ navigation }) {
                         })[0]?.score == undefined
                           ? "-"
                           : score.filter((items) => {
-                              return (
-                                items.lesson_id == item.id &&
-                                items.Type == "PRETEST"
-                              );
-                            })[0]?.score + " %"}
+                            return (
+                              items.lesson_id == item.id &&
+                              items.Type == "PRETEST"
+                            );
+                          })[0]?.score + " %"}
                       </Text>
                       <Text
                         style={[
@@ -206,11 +241,11 @@ export default function Home({ navigation }) {
                         })[0]?.score == undefined
                           ? "-"
                           : score.filter((items) => {
-                              return (
-                                items.lesson_id == item.id &&
-                                items.Type == "POSTTEST"
-                              );
-                            })[0]?.score + " %"}
+                            return (
+                              items.lesson_id == item.id &&
+                              items.Type == "POSTTEST"
+                            );
+                          })[0]?.score + " %"}
                       </Text>
                     </View>
 
@@ -219,11 +254,11 @@ export default function Home({ navigation }) {
                         style={{ width: 100, height: 100 }}
                         source={{
                           uri:
-                            "http://144.126.242.196:5000/api/image/getimage/" +
+                            "http://165.22.251.6:5000/api/image/getimage/" +
                             item.image_url,
                         }}
                       />
-                      <View style={{ marginTop: 11 }}>
+                      {/* <View style={{ marginTop: 11 }}>
                         <Text
                           style={[
                             styles.textLight,
@@ -232,7 +267,7 @@ export default function Home({ navigation }) {
                         >
                           {"Start >>>"}
                         </Text>
-                      </View>
+                      </View> */}
                     </View>
                   </TouchableOpacity>
                 );
@@ -248,6 +283,12 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 12,
+  },
+  viewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    // paddingHorizontal: 29,
+    alignItems: "center",
   },
   viewDetail: {
     width: "100%",

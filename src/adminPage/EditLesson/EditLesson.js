@@ -237,7 +237,7 @@ export default function EditLesson({ navigation }) {
                   style={{ width: "100%", height: 200 }}
                   source={{
                     uri:
-                      "http://144.126.242.196:5000/api/image/getimage/" +
+                      "http://165.22.251.6:5000/api/image/getimage/" +
                       state.image_url,
                   }}
                 />

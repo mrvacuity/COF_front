@@ -578,7 +578,7 @@ export default function Login({ navigation }) {
                         }}
                         source={{
                           uri:
-                            // "http://144.126.242.196:5000/api/image/getimage/" +
+                            // "http://165.22.251.6:5000/api/image/getimage/" +
                             image,
                         }}
                       />

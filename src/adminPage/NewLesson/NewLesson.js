@@ -169,7 +169,7 @@ export default function NewLesson({ navigation, route }) {
                   }}
                   source={{
                     uri:
-                      "http://144.126.242.196:5000/api/image/getimage/" +
+                      "http://165.22.251.6:5000/api/image/getimage/" +
                       state.image_url.img,
                   }}
                 />

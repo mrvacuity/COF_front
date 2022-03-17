@@ -517,12 +517,24 @@ export default function Camara({ navigation }) {
                 <SimpleLineIcons name="reload" size={20} color="#484848" />
               </TouchableOpacity>
             ) : (
-              <Text style={{ width: "10%" }}></Text>
+              <TouchableOpacity
+                onPress={() => {
+                  // setModalVisible(true);
+                  navigation.navigate("CameraGuide");
+                }}
+              >
+                <Ionicons name="alert-circle-outline" size={24} color="black" />
+              </TouchableOpacity>
+
             )}
 
-            <Text style={styles.textTitle}>Camera</Text>
-
-            <Feather name="save" size={20} color="#z`484848" />
+            <Text style={styles.textTitle}>Coffee Analysis</Text>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("HistoryResult");
+              }}>
+              <Feather name="save" size={20} color="#z`484848" />
+            </TouchableOpacity>
           </View>
           {page == 1 && (
             <Camera
@@ -540,7 +552,7 @@ export default function Camara({ navigation }) {
               ]}
               source={{
                 uri:
-                  "http://144.126.242.196:5000/api/image/getimage/" +
+                  "http://165.22.251.6:5000/api/image/getimage/" +
                   DefaultsImage.replace(".png", ""),
               }}
             />
@@ -556,7 +568,7 @@ export default function Camara({ navigation }) {
                   style={styles.capture}
                 >
                   <Image
-                    style={{ width: 50, height: 50 }}
+                    style={{ width: 40, height: 40 }}
                     source={require("../../img/camera.png")}
                   />
                 </TouchableOpacity>
@@ -567,7 +579,8 @@ export default function Camara({ navigation }) {
                   <Feather name="image" size={30} color="#484848" />
                 </TouchableOpacity>
               </View>
-              <View
+
+              {/* <View
                 style={{
                   width: width * 0.8,
                   backgroundColor: "#E0DAD6",
@@ -577,8 +590,30 @@ export default function Camara({ navigation }) {
                   paddingHorizontal: 20,
                   paddingVertical: 20,
                 }}
+              > */}
+              <View style={{
+                alignItems: 'center',
+                justifyContent: "center",
+                width: '80%',
+                height: '20%',
+                borderRadius: 10,
+                backgroundColor: "#E0DAD6",
+                marginLeft: '10%',
+              }}
+              // E0DAD6
               >
-                <View style={{ flexDirection: "row" }}>
+                <View style={{
+                  alignItems: 'center',
+                }}
+                >
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontFamily: "RobotoBold" }}>Hints</Text>
+                    <Text style={{}}>: For best results, please utilize a </Text>
+                  </View>
+                  <Text style={{ fontFamily: "RobotoBold", }}>white background</Text>
+                </View>
+              </View>
+              {/* <View style={{ flexDirection: "row" }}>
                   <Text
                     style={{
                       fontSize: 18,
@@ -604,8 +639,8 @@ export default function Camara({ navigation }) {
                       white background.
                     </Text>
                   </View>
-                </View>
-              </View>
+                </View> */}
+              {/* </View> */}
             </View>
           ) : page == 2 ? (
             <View style={{ alignSelf: "center", marginTop: 25 }}>
@@ -707,7 +742,7 @@ export default function Camara({ navigation }) {
                   ]}
                   source={{
                     uri:
-                      "http://144.126.242.196:5000/api/image/getimage/" +
+                      "http://165.22.251.6:5000/api/image/getimage/" +
                       DefaultsImage.replace(".png", ""),
                   }}
                 />
@@ -719,12 +754,12 @@ export default function Camara({ navigation }) {
                         {data >= 0 && data <= 4.49
                           ? "-"
                           : data >= 4.5 && data <= 4.89
-                          ? "Light Roast"
-                          : data >= 4.9 && data <= 5.09
-                          ? "Medium Roast"
-                          : data >= 5.1 && data <= 6
-                          ? "Dark Roast"
-                          : data >= 6.01 && data <= 14 && "-"}
+                            ? "Light Roast"
+                            : data >= 4.9 && data <= 5.09
+                              ? "Medium Roast"
+                              : data >= 5.1 && data <= 6
+                                ? "Dark Roast"
+                                : data >= 6.01 && data <= 14 && "-"}
                       </Text>
                     </Text>
                     <TouchableOpacity
@@ -794,14 +829,14 @@ export default function Camara({ navigation }) {
                     {data >= 0 && data <= 4.49
                       ? "Unidentified because coffee beans usually have the pH value only between 4.5 - 6.0"
                       : data >= 4.5 && data <= 4.89
-                      ? "The fruit acids in the coffee give it a sour flavor, with a hint of sweetness on the tip of the tongue."
-                      : data >= 4.9 && data <= 5.09
-                      ? "There isn't much sour flavor. The aroma will lean toward caramel and a hint of nutty, almonds. Coffee will increase the weight of the body."
-                      : data >= 5.1 && data <= 6
-                      ? "It tastes slightly sweet and bitter. There is no residual sourness. The perfume of coffee combined with the intense smell of coffee Suitable for creating strong-flavored iced coffee."
-                      : data >= 6.01 &&
-                        data <= 14 &&
-                        "Unidentified because coffee beans usually have the pH value only between 4.5 - 6.0 "}
+                        ? "The fruit acids in the coffee give it a sour flavor, with a hint of sweetness on the tip of the tongue."
+                        : data >= 4.9 && data <= 5.09
+                          ? "There isn't much sour flavor. The aroma will lean toward caramel and a hint of nutty, almonds. Coffee will increase the weight of the body."
+                          : data >= 5.1 && data <= 6
+                            ? "It tastes slightly sweet and bitter. There is no residual sourness. The perfume of coffee combined with the intense smell of coffee Suitable for creating strong-flavored iced coffee."
+                            : data >= 6.01 &&
+                            data <= 14 &&
+                            "Unidentified because coffee beans usually have the pH value only between 4.5 - 6.0 "}
                   </Text>
                   <Text style={[styles.textSuject, { marginVertical: 10 }]}>
                     Recommend Menu
@@ -815,12 +850,12 @@ export default function Camara({ navigation }) {
                     {data >= 0 && data <= 4.49
                       ? "-"
                       : data >= 4.5 && data <= 4.89
-                      ? "• Hot Coffee"
-                      : data >= 4.9 && data <= 5.09
-                      ? "• Cappuccino\n• Mocha\n• Latte"
-                      : data >= 5.1 && data <= 6
-                      ? "• Iced espresso\n• Coffee shake"
-                      : data >= 6.01 && data <= 14 && "-"}
+                        ? "• Hot Coffee"
+                        : data >= 4.9 && data <= 5.09
+                          ? "• Cappuccino\n• Mocha\n• Latte"
+                          : data >= 5.1 && data <= 6
+                            ? "• Iced espresso\n• Coffee shake"
+                            : data >= 6.01 && data <= 14 && "-"}
                   </Text>
 
                   {/* <View style={styles.viewTopic}>
@@ -934,7 +969,8 @@ const styles = StyleSheet.create({
   viewCapture: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 70,
+    marginTop: 20,
+    marginBottom: 20,
     alignItems: "center",
   },
   viewTopic: {

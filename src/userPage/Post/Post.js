@@ -173,8 +173,8 @@ export default function Post({ navigation, route }) {
                 source={{
                   uri:
                     data != null && image == null
-                      ? "http://144.126.242.196:5000/api/image/getimage/" +
-                        data.image_url
+                      ? "http://165.22.251.6:5000/api/image/getimage/" +
+                      data.image_url
                       : image,
                 }}
               />

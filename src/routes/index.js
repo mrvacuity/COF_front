@@ -30,6 +30,9 @@ import HistoryResultEdit from "../userPage/HistoryResultEdit/HistoryResultEdit";
 import ArticsDetail from "../userPage/ArticlesDetail/ArticsDetail";
 import Favorite from "../userPage/Favorite/Favorite";
 import Post from "../userPage/Post/Post";
+import CameraGuide from "../userPage/CameraGuide/CameraGuide";
+import HomeGuide from "../userPage/HomeGuide/HomeGuide";
+
 import Menu from "../adminPage/Menu/Menu";
 import EditLesson from "../adminPage/EditLesson/EditLesson";
 import EditArticle from "../adminPage/EditArticle/EditArticle";
@@ -66,6 +69,8 @@ function main() {
       <Stack.Screen name="ArticlesDetail" component={ArticsDetail} />
       <Stack.Screen name="Favorite" component={Favorite} />
       <Stack.Screen name="Post" component={Post} />
+      <Stack.Screen name="CameraGuide" component={CameraGuide} />
+      <Stack.Screen name="HomeGuide" component={HomeGuide} />
 
       <Stack.Screen name="EditLesson" component={EditLesson} />
       <Stack.Screen name="EditArticle" component={EditArticle} />
