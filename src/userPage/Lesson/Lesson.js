@@ -108,7 +108,7 @@ export default function Lesson({ navigation, route }) {
               <Text style={{ fontSize: 18, fontFamily: "RobotoBold" }}>
                 {data[tab].title}
               </Text>
-              {testMedium ? (
+              {/* {testMedium ? (
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate("Test", route.params);
@@ -126,7 +126,15 @@ export default function Lesson({ navigation, route }) {
                 >
                   <Text style={styles.textLight}>{"<<<"}</Text>
                 </TouchableOpacity>
-              )}
+              )} */}
+              <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Test", route.params);
+                  }}
+                  style={styles.buttonTest}
+                >
+                  <Text style={styles.textLight}>{"Let's Test!"}</Text>
+                </TouchableOpacity>
             </View>
             {data[tab].image_url.img != null && data[tab].image_url.img != "" && (
               <Image
@@ -236,7 +244,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonTest: {
-    width: 54,
+    width: '27%',
     height: 32,
     borderWidth: 0.2,
     borderTopLeftRadius: 50,
