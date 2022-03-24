@@ -30,7 +30,14 @@ export default function HistoryResultEdit({ navigation, route }) {
   const token = useRecoilValue(tokenState);
   const [data, setdata] = useState(parseFloat(route?.params?.Sour)?.toFixed(2));
   const [edit, setedit] = useState(false);
-  const [select, setSelect] = useState("Arabica");
+  const [brand, setbrand] = useState(route?.params?.brand);
+  const [source, setsource] = useState(route?.params?.source);
+  // const [quantity, setquantity] = useState(parseFloat(route?.params?.Sour)?.toFixed(2));
+  const [quantity, setquantity] = useState(route?.params?.quantity);
+  const [temp, settemp] = useState(route?.params?.temp);
+  const [timeh, settimeh] = useState(route?.params?.timeh);
+  const [timem, settimem] = useState(route?.params?.timem);
+  const [select, setSelect] = useState(route?.params?.species);
   const [species, setspecies] = useState(false);
   const [result, setresult] = useState();
   useEffect(() => {
@@ -135,6 +142,7 @@ export default function HistoryResultEdit({ navigation, route }) {
               style={{ width: "100%", flexDirection: "row", marginTop: 20 }}
             >
               {color.map((item, index) => {
+                // console.log(data);
                 return (
                   <View style={{ alignItems: "center" }}>
                     <Text
@@ -148,7 +156,7 @@ export default function HistoryResultEdit({ navigation, route }) {
                     </Text>
                     <View
                       style={{
-                        borderWidth: index == result ? 3 : 0,
+                        borderWidth: index == Math.floor(data) ? 3 : 0,
                         borderColor: "#484848",
                         backgroundColor: item,
                         width: width * 0.055,
@@ -171,8 +179,9 @@ export default function HistoryResultEdit({ navigation, route }) {
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text style={styles.textSujectLight}>Brand : </Text>
                 <TextInput
+                  onChangeText={setbrand}
                   editable={!edit ? false : true}
-                  defaultValue="Test"
+                  defaultValue= {brand}
                   style={{
                     width: edit ? "82%" : "80%",
                     borderRadius: 5,
@@ -188,7 +197,7 @@ export default function HistoryResultEdit({ navigation, route }) {
               {!edit && (
                 <TouchableOpacity
                   onPress={() => {
-                    // setedit(true);
+                    setedit(true);
                   }}
                 >
                   <FontAwesome5 name="edit" size={14} color="#484848" />
@@ -284,7 +293,8 @@ export default function HistoryResultEdit({ navigation, route }) {
               <Text style={styles.textSujectLight}>Source : </Text>
               <TextInput
                 editable={!edit ? false : true}
-                defaultValue="Thailand"
+                onChangeText={setsource}
+                defaultValue= {source}
                 style={{
                   width: edit ? "78%" : "78%",
                   borderRadius: 5,
@@ -308,7 +318,9 @@ export default function HistoryResultEdit({ navigation, route }) {
               <Text style={styles.textSujectLight}>Quantity : </Text>
               <TextInput
                 editable={!edit ? false : true}
-                defaultValue="5 gram"
+                keyboardType="number-pad"
+                defaultValue={quantity > 0 ? ((quantity)).toString() : "-"}
+                onChangeText={setquantity}
                 style={{
                   width: edit ? "75%" : "75%",
                   borderRadius: 5,
@@ -332,7 +344,9 @@ export default function HistoryResultEdit({ navigation, route }) {
               <Text style={styles.textSujectLight}>Temperature : </Text>
               <TextInput
                 editable={!edit ? false : true}
-                defaultValue="5"
+                keyboardType="number-pad"
+                defaultValue= {temp > 0 ? (temp).toString() : "-"}
+                onChangeText={settemp}
                 style={{
                   width: edit ? "18%" : "18%",
                   borderRadius: 5,
@@ -353,14 +367,16 @@ export default function HistoryResultEdit({ navigation, route }) {
                 marginTop: 20,
               }}
             >
-              <Text style={styles.textSujectLight}>Time : </Text>
+              <Text style={styles.textSujectLight}>Time :</Text>
+
               <TextInput
                 editable={!edit ? false : true}
                 keyboardType="numeric"
+                onChangeText={settimeh}
                 maxLength={3}
-                defaultValue="5"
+                defaultValue= {timem > 0 ? (timeh).toString() : "-"}
                 style={{
-                  width: edit ? "12%" : "12%",
+                  width: edit ? "18%" : "18%",
                   borderRadius: 5,
                   height: 29,
                   backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
@@ -376,10 +392,11 @@ export default function HistoryResultEdit({ navigation, route }) {
               <TextInput
                 editable={!edit ? false : true}
                 keyboardType="numeric"
+                onChangeText={settimem}
                 maxLength={2}
-                defaultValue="5"
+                defaultValue={timem > 0 ? (timem).toString() : "-"}
                 style={{
-                  width: edit ? "12%" : "12%",
+                  width: edit ? "15%" : "15%",
                   borderRadius: 5,
                   height: 29,
                   backgroundColor: edit ? "#FFFFFF" : "#f0e9e4",
@@ -391,16 +408,6 @@ export default function HistoryResultEdit({ navigation, route }) {
               />
               <Text style={styles.textSujectLight}>min</Text>
             </View>
-            {/* <View style={styles.viewTopic}>
-              <Text style={styles.textSujectLight}>Sweetness</Text>
-              <Text style={styles.textSujectLight}>20 brix</Text>
-            </View>
-            <View style={styles.viewTopic}>
-              <Text style={styles.textSujectLight}>
-                Total dissolved solids (TDS)
-              </Text>
-              <Text style={styles.textSujectLight}>40 ppm</Text>
-            </View> */}
             <Text
               style={[styles.textSujectLight, { color: "#000", marginTop: 34 }]}
             >
@@ -409,7 +416,7 @@ export default function HistoryResultEdit({ navigation, route }) {
             <TextInput
               editable={!edit ? false : true}
               defaultValue={
-                "hello world"
+                description
               }
               onChangeText={setdescription}
               placeholder="Enter your description"
@@ -430,13 +437,21 @@ export default function HistoryResultEdit({ navigation, route }) {
                     body: {
                       ...route.params,
                       description,
+                      brand,
+                      species,
+                      source,
+                      quantity,
+                      temp,
+                      timeh,
+                      timem
                     },
                     token: token.accessToken,
                   });
 
                   if (res.status == 200) {
                     Alert.alert("Update success");
-                    navigation.goBack();
+                    setedit(false);
+                    // navigation.goBack();
                   }
                 }}
                 style={styles.button}

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  Platform
 } from "react-native";
 import {
   Ionicons
@@ -21,6 +22,7 @@ import { tokenState } from "../../recoil/recoil";
 import { apiservice } from "../../service/api";
 import { useIsFocused } from "@react-navigation/native";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+// import { Platform } from "react-native-web";
 const { width, height } = Dimensions.get("screen");
 export default function Home({ navigation }) {
   const [token, setToken] = useRecoilState(tokenState);
@@ -149,7 +151,7 @@ export default function Home({ navigation }) {
 
             <FlatList
               numColumns={1}
-              style={{ marginBottom: 20 }}
+              style={{ marginBottom: Platform.OS == 'android' ? height * 0.1 : 20, }}
               data={data}
               extraData={score}
               renderItem={({ item, index }) => {
@@ -273,6 +275,7 @@ export default function Home({ navigation }) {
                 );
               }}
             />
+
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -38,7 +38,7 @@ export default function HistoryResult({ navigation }) {
       method: "get",
       token: token.accessToken,
     });
-
+    console.log(res[0]);
     if (res.status == 200) {
       setData(res.data);
     }

@@ -4,6 +4,7 @@ import {
   Text,
   SafeAreaView,
   Image,
+  Alert,
   Dimensions,
   StyleSheet,
   TouchableOpacity,
@@ -49,8 +50,17 @@ export default function Camara({ navigation }) {
   const [page, setPage] = useState(1);
   const [species, setspecies] = useState(false);
   const [data, setdata] = useState();
-  const [select, setSelect] = useState(null);
+  const [select, setSelect] = useState("-");
   const [resultPh, setresultPh] = useState();
+  const [description, setdescription] = useState("-");
+  const [state, setState] = useState({
+    brand: "-",
+    source:"-",
+    quantity: 0,
+    temp: 0,
+    timeh: 0,
+    timem: 0,
+  });
 
   useEffect(() => {
     (async () => {
@@ -83,38 +93,6 @@ export default function Camara({ navigation }) {
 
     setDefaultsImage(base64upload.data.imageRefId);
     setPage(2);
-    // const res = await axios.post(
-    //   "https://getprediction-eb7wj7y6sa-as.a.run.app",
-    //   formData,
-    //   {
-    //     headers: { "Content-Type": "multipart/form-data" },
-    //   }
-    // );
-
-    // if (res.status == 200) {
-    //   serResults(res.data["Prediction (pH)"]);
-    //   setPage(2);
-    //   setResult(false);
-    // } else {
-    //   setResult(false);
-    // }
-
-    // const res = await apiservice({
-    //   path: "/image/create",
-    //   method: "post",
-    //   body: {
-    //     name: result.uri.split("/").reverse()[0],
-    //     base64: "data:image/png;base64," + result.base64,
-    //   },
-    // });
-
-    // if (res.status == 200) {
-    //   setState({
-    //     ...state,
-    //     image_profile: res.data.imageRefId.replace(".png", ""),
-    //   });
-    // } else {
-    // }
   };
 
   const onCameraReady = () => {
@@ -181,9 +159,11 @@ export default function Camara({ navigation }) {
             setModalVisible1(!modalVisible1);
           }}
         >
+
           <View style={styles.bgModal}>
 
             <View style={[styles.viewAboutpHModal,]}>
+
               <TouchableOpacity
                 onPress={() => {
                   setModalVisible1(false);
@@ -245,6 +225,8 @@ export default function Camara({ navigation }) {
             </View>
 
           </View>
+
+
         </Modal>
         <Modal
           animationType="slide"
@@ -273,6 +255,9 @@ export default function Camara({ navigation }) {
                 >
                   <Text style={styles.text}>Brand : </Text>
                   <TextInput
+                  onChangeText={(text) => {
+                    setState({ ...state, brand: text});
+                  }}
                     style={{
                       width: "60%",
                       borderRadius: 5,
@@ -374,6 +359,9 @@ export default function Camara({ navigation }) {
                 >
                   <Text style={styles.text}>Source : </Text>
                   <TextInput
+                  onChangeText={(text) => {
+                    setState({ ...state, source: text});
+                  }}
                     style={{
                       width: "58%",
                       borderRadius: 5,
@@ -396,6 +384,10 @@ export default function Camara({ navigation }) {
                 >
                   <Text style={styles.text}>Quantity : </Text>
                   <TextInput
+                  keyboardType="number-pad"
+                  onChangeText={(value) => {
+                    setState({ ...state, quantity: value});
+                  }}
                     style={{
                       width: "43%",
                       borderRadius: 5,
@@ -423,8 +415,11 @@ export default function Camara({ navigation }) {
                   <TextInput
                     maxLength={3}
                     keyboardType="number-pad"
+                    onChangeText={(value) => {
+                      setState({ ...state, temp: value});
+                    }}
                     style={{
-                      width: "18%",
+                      width: "20%",
                       borderRadius: 5,
                       height: 29,
                       backgroundColor: "#F1F1F1",
@@ -448,6 +443,9 @@ export default function Camara({ navigation }) {
                   <TextInput
                     keyboardType="numeric"
                     maxLength={3}
+                    onChangeText={(value) => {
+                      setState({ ...state, timeh: value});
+                    }}
                     style={{
                       width: "20%",
                       borderRadius: 5,
@@ -463,6 +461,9 @@ export default function Camara({ navigation }) {
                   <Text style={[styles.text, { marginHorizontal: 5 }]}>:</Text>
                   <TextInput
                     keyboardType="numeric"
+                    onChangeText={(value) => {
+                      setState({ ...state, timem: value});
+                    }}
                     maxLength={2}
                     style={{
                       width: "20%",
@@ -493,6 +494,7 @@ export default function Camara({ navigation }) {
 
                 <TextInput
                   placeholderTextColor={"#484848"}
+                  onChangeText = {setdescription}
                   multiline
                   style={[
                     styles.text,
@@ -500,7 +502,6 @@ export default function Camara({ navigation }) {
                     { backgroundColor: "#F1F1F1" },
                   ]}
                 />
-
                 <View style={{ flexDirection: "row", marginTop: 20 }}>
                   <TouchableOpacity
                     onPress={() => {
@@ -518,22 +519,33 @@ export default function Camara({ navigation }) {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={async () => {
+                      if ( !isNaN(state.quantity) && !isNaN(state.temp) && !isNaN(state.timeh) && !isNaN(state.timem) ){
                       const res1 = await apiservice({
                         path: "/lesson/createhistory",
                         method: "post",
                         body: {
                           Sour: results,
-                          Sweet: 0,
                           image_url: DefaultsImage,
-                          total: 0,
+                          brand: state.brand,
+                          source:state.source,
+                          species: select,
+                          quantity: state.quantity,
+                          temp: state.temp,
+                          timeh: state.timeh,
+                          timem: state.timem,
+                          description: description
                         },
                         token: token.accessToken,
                       });
-
                       if (res1.status == 200) {
                         setPage(1);
                         setModalVisible(false);
                       }
+                    } else if ( isNaN(state.quantity) ){
+                      Alert.alert("Quantity should be number such as 2, 2.5, 5!!")
+                    } else {
+                      Alert.alert("Temp, Time sholud be integer such as 2, 10, 20!!")
+                    }
                     }}
                     style={{
                       width: width * 0.28,
@@ -666,7 +678,7 @@ export default function Camara({ navigation }) {
                 </View>
 
 
-                <TouchableOpacity
+                {/* <TouchableOpacity
               onPress={() => {
                 setModalVisible1(true);
 
@@ -707,38 +719,8 @@ export default function Camara({ navigation }) {
               >
                 <Text style={styles.textSujectLight}>About pH Value</Text>
               </View>
-            </TouchableOpacity>
-
-
+            </TouchableOpacity> */}
               </View>
-              {/* <View style={{ flexDirection: "row" }}>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontFamily: "RobotoBold",
-                      color: "#484848",
-                    }}
-                  >
-                    Hints:{" "}
-                  </Text>
-                  <View>
-                    <Text style={styles.textSuject}>
-                      {"For best results, please utilize a\n"}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontFamily: "RobotoBold",
-                        color: "#484848",
-                        textAlign: "center",
-                        marginTop: -10,
-                      }}
-                    >
-                      white background.
-                    </Text>
-                  </View>
-                </View> */}
-              {/* </View> */}
             </View>
           ) : page == 2 ? (
             <View style={{ alignSelf: "center", marginTop: 25 }}>
@@ -909,7 +891,7 @@ export default function Camara({ navigation }) {
                           </Text>
                           <View
                             style={{
-                              borderWidth: index == resultPh ? 3 : 0,
+                              borderWidth: index == Math.floor(data) ? 3 : 0,
                               borderColor: "#484848",
                               backgroundColor: item,
                               width: width * 0.055,
@@ -942,7 +924,8 @@ export default function Camara({ navigation }) {
                   <Text
                     style={[
                       styles.textSujectLight,
-                      { marginVertical: 5, marginBottom: 50 },
+                      { marginVertical: 5,
+                        marginBottom: Platform.OS == 'android' ? height * 0.15 : 50,},
                     ]}
                   >
                     {data >= 0 && data <= 4.49
@@ -955,18 +938,9 @@ export default function Camara({ navigation }) {
                             ? "• Iced espresso\n• Coffee shake"
                             : data >= 6.01 && data <= 14 && "-"}
                   </Text>
-
-                  {/* <View style={styles.viewTopic}>
-                <Text style={styles.textSujectLight}>Sweetness</Text>
-                <Text style={styles.textSujectLight}>20 brix</Text>
-              </View> */}
-                  {/* <View style={styles.viewTopic}>
-                <Text style={styles.textSujectLight}>
-                  Total dissolved solids (TDS)
-                </Text>
-                <Text style={styles.textSujectLight}>40 ppm</Text>
-              </View> */}
                 </View>
+
+
               </ScrollView>
             )
           )}
@@ -978,7 +952,8 @@ export default function Camara({ navigation }) {
               style={{
                 width: 160,
                 height: 67,
-
+                marginBottom: Platform.OS == 'android' ? height * 0.1 : 20,
+                // marginTop: Platform.OS == 'android' ? height *  : 20,
                 position: "absolute",
                 bottom: 0,
                 alignSelf: "center",

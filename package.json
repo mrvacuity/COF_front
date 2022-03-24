@@ -41,7 +41,7 @@
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.10.1",
     "react-native-unordered-list": "^1.0.4",
-    "react-native-web": "0.17.1",
+    "react-native-web": "^0.17.7",
     "react-native-webview": "^11.17.1",
     "react-native-youtube-iframe": "^2.2.2",
     "recoil": "^0.5.2"
